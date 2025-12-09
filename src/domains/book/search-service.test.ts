@@ -277,4 +277,194 @@ describe('SearchService.search', () => {
       });
     });
   });
+
+  // ============================================
+  // Task 3.2: 詳細検索とフィルタリング機能
+  // ============================================
+
+  describe('出版年範囲による絞り込み', () => {
+    it('出版年の開始年で絞り込みができる', async () => {
+      const books = [
+        createMockBook({ id: createBookId('book-1'), publicationYear: 2020 }),
+        createMockBook({ id: createBookId('book-2'), publicationYear: 2023 }),
+      ];
+      const searchSpy = vi.fn().mockResolvedValue({ books, total: 2 });
+      mockRepository = createMockSearchRepository({ search: searchSpy });
+      service = createSearchService(mockRepository);
+
+      const result: Result<SearchBooksResult, never> = await service.search({
+        keyword: '書籍',
+        publicationYearFrom: 2020,
+      });
+
+      expect(isOk(result)).toBe(true);
+      expect(searchSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          keyword: '書籍',
+          publicationYearFrom: 2020,
+        })
+      );
+    });
+
+    it('出版年の終了年で絞り込みができる', async () => {
+      const books = [
+        createMockBook({ id: createBookId('book-1'), publicationYear: 2018 }),
+      ];
+      const searchSpy = vi.fn().mockResolvedValue({ books, total: 1 });
+      mockRepository = createMockSearchRepository({ search: searchSpy });
+      service = createSearchService(mockRepository);
+
+      const result: Result<SearchBooksResult, never> = await service.search({
+        keyword: '書籍',
+        publicationYearTo: 2020,
+      });
+
+      expect(isOk(result)).toBe(true);
+      expect(searchSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          keyword: '書籍',
+          publicationYearTo: 2020,
+        })
+      );
+    });
+
+    it('出版年の範囲（開始年と終了年）で絞り込みができる', async () => {
+      const books = [
+        createMockBook({ id: createBookId('book-1'), publicationYear: 2020 }),
+        createMockBook({ id: createBookId('book-2'), publicationYear: 2022 }),
+      ];
+      const searchSpy = vi.fn().mockResolvedValue({ books, total: 2 });
+      mockRepository = createMockSearchRepository({ search: searchSpy });
+      service = createSearchService(mockRepository);
+
+      const result: Result<SearchBooksResult, never> = await service.search({
+        keyword: '書籍',
+        publicationYearFrom: 2019,
+        publicationYearTo: 2023,
+      });
+
+      expect(isOk(result)).toBe(true);
+      expect(searchSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          keyword: '書籍',
+          publicationYearFrom: 2019,
+          publicationYearTo: 2023,
+        })
+      );
+    });
+  });
+
+  describe('カテゴリによるフィルタリング', () => {
+    it('カテゴリで絞り込みができる', async () => {
+      const books = [
+        createMockBook({ id: createBookId('book-1'), category: 'プログラミング' }),
+      ];
+      const searchSpy = vi.fn().mockResolvedValue({ books, total: 1 });
+      mockRepository = createMockSearchRepository({ search: searchSpy });
+      service = createSearchService(mockRepository);
+
+      const result: Result<SearchBooksResult, never> = await service.search({
+        keyword: '入門',
+        category: 'プログラミング',
+      });
+
+      expect(isOk(result)).toBe(true);
+      expect(searchSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          keyword: '入門',
+          category: 'プログラミング',
+        })
+      );
+    });
+  });
+
+  describe('貸出可能書籍のみの絞り込み', () => {
+    it('貸出可能な書籍のみで絞り込みができる', async () => {
+      const books = [
+        createMockBook({ id: createBookId('book-1') }),
+      ];
+      const searchSpy = vi.fn().mockResolvedValue({ books, total: 1 });
+      mockRepository = createMockSearchRepository({ search: searchSpy });
+      service = createSearchService(mockRepository);
+
+      const result: Result<SearchBooksResult, never> = await service.search({
+        keyword: '書籍',
+        availableOnly: true,
+      });
+
+      expect(isOk(result)).toBe(true);
+      expect(searchSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          keyword: '書籍',
+          availableOnly: true,
+        })
+      );
+    });
+
+    it('availableOnlyがfalseの場合は全書籍を返す', async () => {
+      const searchSpy = vi.fn().mockResolvedValue({ books: [], total: 0 });
+      mockRepository = createMockSearchRepository({ search: searchSpy });
+      service = createSearchService(mockRepository);
+
+      await service.search({
+        keyword: '書籍',
+        availableOnly: false,
+      });
+
+      expect(searchSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          keyword: '書籍',
+          availableOnly: false,
+        })
+      );
+    });
+  });
+
+  describe('複合条件での検索', () => {
+    it('複数のフィルタ条件を組み合わせて検索できる', async () => {
+      const books = [
+        createMockBook({
+          id: createBookId('book-1'),
+          category: 'プログラミング',
+          publicationYear: 2022,
+        }),
+      ];
+      const searchSpy = vi.fn().mockResolvedValue({ books, total: 1 });
+      mockRepository = createMockSearchRepository({ search: searchSpy });
+      service = createSearchService(mockRepository);
+
+      const result: Result<SearchBooksResult, never> = await service.search({
+        keyword: 'JavaScript',
+        category: 'プログラミング',
+        publicationYearFrom: 2020,
+        publicationYearTo: 2024,
+        availableOnly: true,
+        sortBy: 'publicationYear',
+        sortOrder: 'desc',
+      });
+
+      expect(isOk(result)).toBe(true);
+      expect(searchSpy).toHaveBeenCalledWith({
+        keyword: 'JavaScript',
+        category: 'プログラミング',
+        publicationYearFrom: 2020,
+        publicationYearTo: 2024,
+        availableOnly: true,
+        sortBy: 'publicationYear',
+        sortOrder: 'desc',
+      });
+    });
+
+    it('フィルタなしでもキーワード検索のみで動作する', async () => {
+      const searchSpy = vi.fn().mockResolvedValue({ books: [], total: 0 });
+      mockRepository = createMockSearchRepository({ search: searchSpy });
+      service = createSearchService(mockRepository);
+
+      await service.search({ keyword: 'テスト' });
+
+      expect(searchSpy).toHaveBeenCalledWith({
+        keyword: 'テスト',
+      });
+    });
+  });
 });

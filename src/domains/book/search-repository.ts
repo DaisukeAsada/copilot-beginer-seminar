@@ -25,6 +25,14 @@ export interface SearchBooksInput {
   readonly sortBy?: SearchSortBy;
   /** ソート順序 */
   readonly sortOrder?: SearchSortOrder;
+  /** 出版年の開始（以上） */
+  readonly publicationYearFrom?: number;
+  /** 出版年の終了（以下） */
+  readonly publicationYearTo?: number;
+  /** カテゴリによる絞り込み */
+  readonly category?: string;
+  /** 貸出可能書籍のみ */
+  readonly availableOnly?: boolean;
 }
 
 /** 検索結果 */

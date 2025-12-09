@@ -4,6 +4,7 @@
  * 蔵書検索処理を提供します。
  * タイトル、著者、ISBN、カテゴリによる部分一致検索と
  * 検索結果のソート機能を実装します。
+ * Task 3.2: 詳細検索とフィルタリング機能（出版年範囲、カテゴリ、貸出可能のみ）
  */
 
 import type { Result } from '../../shared/result.js';
@@ -28,6 +29,14 @@ export interface SearchInput {
   readonly sortBy?: SearchSortBy;
   /** ソート順序 */
   readonly sortOrder?: SearchSortOrder;
+  /** 出版年の開始（以上） */
+  readonly publicationYearFrom?: number;
+  /** 出版年の終了（以下） */
+  readonly publicationYearTo?: number;
+  /** カテゴリによる絞り込み */
+  readonly category?: string;
+  /** 貸出可能書籍のみ */
+  readonly availableOnly?: boolean;
 }
 
 /** SearchService インターフェース */
@@ -56,6 +65,10 @@ export function createSearchService(repository: SearchRepository): SearchService
         keyword: input.keyword,
         ...(input.sortBy !== undefined && { sortBy: input.sortBy }),
         ...(input.sortOrder !== undefined && { sortOrder: input.sortOrder }),
+        ...(input.publicationYearFrom !== undefined && { publicationYearFrom: input.publicationYearFrom }),
+        ...(input.publicationYearTo !== undefined && { publicationYearTo: input.publicationYearTo }),
+        ...(input.category !== undefined && { category: input.category }),
+        ...(input.availableOnly !== undefined && { availableOnly: input.availableOnly }),
       };
 
       const result = await repository.search(searchParams);
