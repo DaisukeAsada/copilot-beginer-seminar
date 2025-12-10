@@ -184,7 +184,7 @@
   - _Requirements: 7.1, 7.2, 7.3, 7.4_
 
 ## Task 10: フロントエンド基盤
-- [ ] 10.1 React プロジェクトセットアップ
+- [x] 10.1 React プロジェクトセットアップ
   - Vite + React + TypeScript プロジェクト初期化
   - ルーティング設定（React Router）
   - API クライアント基盤の構築
