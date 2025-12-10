@@ -14,3 +14,5 @@ export type { UserRepository } from './user-repository.js';
 
 export type { UserService } from './user-service.js';
 export { createUserService } from './user-service.js';
+
+export { createUserController } from './user-controller.js';

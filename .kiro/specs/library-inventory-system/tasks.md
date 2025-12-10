@@ -79,7 +79,7 @@
   - 利用者詳細表示（現在の貸出状況、貸出履歴）
   - _Requirements: 5.2, 5.3_
 
-- [ ] 4.3 利用者管理 REST API エンドポイント
+- [x] 4.3 利用者管理 REST API エンドポイント
   - POST /api/users - 利用者登録
   - GET /api/users/:id - 利用者詳細取得
   - GET /api/users/search - 利用者検索
