@@ -1,0 +1,58 @@
+/**
+ * Loan Domain - 型定義
+ *
+ * 貸出管理ドメインの型定義を提供します。
+ */
+
+import type { LoanId, UserId, CopyId } from '../../shared/branded-types.js';
+
+// ============================================
+// 貸出型定義
+// ============================================
+
+/** 貸出 */
+export interface Loan {
+  readonly id: LoanId;
+  readonly userId: UserId;
+  readonly bookCopyId: CopyId;
+  readonly borrowedAt: Date;
+  readonly dueDate: Date;
+  readonly returnedAt: Date | null;
+}
+
+/** 貸出作成入力 */
+export interface CreateLoanInput {
+  readonly userId: UserId;
+  readonly bookCopyId: CopyId;
+}
+
+// ============================================
+// 返却期限設定
+// ============================================
+
+/** デフォルト貸出期間（日数） */
+export const DEFAULT_LOAN_DURATION_DAYS = 14;
+
+// ============================================
+// 貸出レシート
+// ============================================
+
+/** 貸出レシート（貸出完了時に発行） */
+export interface LoanReceipt {
+  readonly loan: Loan;
+  readonly bookTitle: string;
+  readonly userName: string;
+}
+
+// ============================================
+// エラー型定義
+// ============================================
+
+/** 貸出ドメインエラー */
+export type LoanError =
+  | { readonly type: 'VALIDATION_ERROR'; readonly field: string; readonly message: string }
+  | { readonly type: 'BOOK_NOT_AVAILABLE'; readonly copyId: string }
+  | { readonly type: 'LOAN_LIMIT_EXCEEDED'; readonly userId: string; readonly limit: number; readonly currentCount: number }
+  | { readonly type: 'USER_NOT_FOUND'; readonly userId: string }
+  | { readonly type: 'COPY_NOT_FOUND'; readonly copyId: string }
+  | { readonly type: 'LOAN_NOT_FOUND'; readonly loanId: string };
