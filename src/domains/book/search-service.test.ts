@@ -33,9 +33,7 @@ function createMockBook(overrides: Partial<Book> = {}): Book {
   };
 }
 
-function createMockSearchRepository(
-  overrides: Partial<SearchRepository> = {}
-): SearchRepository {
+function createMockSearchRepository(overrides: Partial<SearchRepository> = {}): SearchRepository {
   return {
     search: vi.fn().mockResolvedValue({
       books: [],
@@ -69,7 +67,9 @@ describe('SearchService.search', () => {
       });
       service = createSearchService(mockRepository);
 
-      const result: Result<SearchBooksResult, never> = await service.search({ keyword: 'JavaScript' });
+      const result: Result<SearchBooksResult, never> = await service.search({
+        keyword: 'JavaScript',
+      });
 
       expect(isOk(result)).toBe(true);
       if (isOk(result)) {
@@ -79,9 +79,7 @@ describe('SearchService.search', () => {
     });
 
     it('著者で部分一致検索できる', async () => {
-      const books = [
-        createMockBook({ id: createBookId('book-1'), author: '山田太郎' }),
-      ];
+      const books = [createMockBook({ id: createBookId('book-1'), author: '山田太郎' })];
       mockRepository = createMockSearchRepository({
         search: vi.fn().mockResolvedValue({ books, total: 1 }),
       });
@@ -97,15 +95,15 @@ describe('SearchService.search', () => {
     });
 
     it('ISBNで検索できる', async () => {
-      const books = [
-        createMockBook({ id: createBookId('book-1'), isbn: '978-4-12-345678-4' }),
-      ];
+      const books = [createMockBook({ id: createBookId('book-1'), isbn: '978-4-12-345678-4' })];
       mockRepository = createMockSearchRepository({
         search: vi.fn().mockResolvedValue({ books, total: 1 }),
       });
       service = createSearchService(mockRepository);
 
-      const result: Result<SearchBooksResult, never> = await service.search({ keyword: '978-4-12-345678-4' });
+      const result: Result<SearchBooksResult, never> = await service.search({
+        keyword: '978-4-12-345678-4',
+      });
 
       expect(isOk(result)).toBe(true);
       if (isOk(result)) {
@@ -124,7 +122,9 @@ describe('SearchService.search', () => {
       });
       service = createSearchService(mockRepository);
 
-      const result: Result<SearchBooksResult, never> = await service.search({ keyword: 'プログラミング' });
+      const result: Result<SearchBooksResult, never> = await service.search({
+        keyword: 'プログラミング',
+      });
 
       expect(isOk(result)).toBe(true);
       if (isOk(result)) {
@@ -140,7 +140,9 @@ describe('SearchService.search', () => {
       });
       service = createSearchService(mockRepository);
 
-      const result: Result<SearchBooksResult, never> = await service.search({ keyword: '存在しない書籍' });
+      const result: Result<SearchBooksResult, never> = await service.search({
+        keyword: '存在しない書籍',
+      });
 
       expect(isOk(result)).toBe(true);
       if (isOk(result)) {
@@ -307,9 +309,7 @@ describe('SearchService.search', () => {
     });
 
     it('出版年の終了年で絞り込みができる', async () => {
-      const books = [
-        createMockBook({ id: createBookId('book-1'), publicationYear: 2018 }),
-      ];
+      const books = [createMockBook({ id: createBookId('book-1'), publicationYear: 2018 })];
       const searchSpy = vi.fn().mockResolvedValue({ books, total: 1 });
       mockRepository = createMockSearchRepository({ search: searchSpy });
       service = createSearchService(mockRepository);
@@ -356,9 +356,7 @@ describe('SearchService.search', () => {
 
   describe('カテゴリによるフィルタリング', () => {
     it('カテゴリで絞り込みができる', async () => {
-      const books = [
-        createMockBook({ id: createBookId('book-1'), category: 'プログラミング' }),
-      ];
+      const books = [createMockBook({ id: createBookId('book-1'), category: 'プログラミング' })];
       const searchSpy = vi.fn().mockResolvedValue({ books, total: 1 });
       mockRepository = createMockSearchRepository({ search: searchSpy });
       service = createSearchService(mockRepository);
@@ -380,9 +378,7 @@ describe('SearchService.search', () => {
 
   describe('貸出可能書籍のみの絞り込み', () => {
     it('貸出可能な書籍のみで絞り込みができる', async () => {
-      const books = [
-        createMockBook({ id: createBookId('book-1') }),
-      ];
+      const books = [createMockBook({ id: createBookId('book-1') })];
       const searchSpy = vi.fn().mockResolvedValue({ books, total: 1 });
       mockRepository = createMockSearchRepository({ search: searchSpy });
       service = createSearchService(mockRepository);

@@ -33,7 +33,7 @@ export function createMigration(input: CreateMigrationInput): Migration {
  * Migration runner to manage and execute migrations
  */
 export class MigrationRunner {
-  private migrations: Migration[] = [];
+  private readonly migrations: Migration[] = [];
 
   /**
    * Register a migration

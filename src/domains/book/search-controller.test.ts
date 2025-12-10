@@ -14,7 +14,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import express, { type Express } from 'express';
 import request from 'supertest';
 import { createSearchController } from './search-controller.js';
-import type { SearchService, SearchInput } from './search-service.js';
+import type { SearchService } from './search-service.js';
 import type { SearchBooksResult } from './search-repository.js';
 import type { Book } from './types.js';
 import type { BookId } from '../../shared/branded-types.js';
@@ -82,17 +82,13 @@ describe('SearchController', () => {
       const books = [createTestBook()];
       vi.mocked(mockService.search).mockResolvedValue(ok(createSearchResult(books)));
 
-      const response = await request(app)
-        .get('/api/books/search')
-        .query({ keyword: 'Test' });
+      const response = await request(app).get('/api/books/search').query({ keyword: 'Test' });
 
       expect(response.status).toBe(200);
       expect(response.body.books).toHaveLength(1);
       expect(response.body.books[0].title).toBe('Test Book');
       expect(response.body.total).toBe(1);
-      expect(mockService.search).toHaveBeenCalledWith(
-        expect.objectContaining({ keyword: 'Test' })
-      );
+      expect(mockService.search).toHaveBeenCalledWith(expect.objectContaining({ keyword: 'Test' }));
     });
 
     it('正常系: ソートパラメータ付きで検索できる', async () => {
@@ -199,22 +195,17 @@ describe('SearchController', () => {
       const books = [createTestBook()];
       vi.mocked(mockService.search).mockResolvedValue(ok(createSearchResult(books)));
 
-      const response = await request(app)
-        .get('/api/books/search');
+      const response = await request(app).get('/api/books/search');
 
       expect(response.status).toBe(200);
-      expect(mockService.search).toHaveBeenCalledWith(
-        expect.objectContaining({ keyword: '' })
-      );
+      expect(mockService.search).toHaveBeenCalledWith(expect.objectContaining({ keyword: '' }));
     });
 
     it('正常系: ページネーションのデフォルト値が適用される', async () => {
       const books = [createTestBook()];
       vi.mocked(mockService.search).mockResolvedValue(ok(createSearchResult(books, 1)));
 
-      const response = await request(app)
-        .get('/api/books/search')
-        .query({ keyword: 'Test' });
+      const response = await request(app).get('/api/books/search').query({ keyword: 'Test' });
 
       expect(response.status).toBe(200);
       expect(response.body.page).toBe(1);
@@ -225,19 +216,17 @@ describe('SearchController', () => {
       const books = [createTestBook({ publicationYear: 2023, category: 'Fiction' })];
       vi.mocked(mockService.search).mockResolvedValue(ok(createSearchResult(books)));
 
-      const response = await request(app)
-        .get('/api/books/search')
-        .query({
-          keyword: 'Test',
-          publicationYearFrom: '2020',
-          publicationYearTo: '2024',
-          category: 'Fiction',
-          availableOnly: 'true',
-          sortBy: 'title',
-          sortOrder: 'asc',
-          page: '1',
-          limit: '10',
-        });
+      const response = await request(app).get('/api/books/search').query({
+        keyword: 'Test',
+        publicationYearFrom: '2020',
+        publicationYearTo: '2024',
+        category: 'Fiction',
+        availableOnly: 'true',
+        sortBy: 'title',
+        sortOrder: 'asc',
+        page: '1',
+        limit: '10',
+      });
 
       expect(response.status).toBe(200);
       expect(mockService.search).toHaveBeenCalledWith(

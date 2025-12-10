@@ -65,8 +65,12 @@ export function createSearchService(repository: SearchRepository): SearchService
         keyword: input.keyword,
         ...(input.sortBy !== undefined && { sortBy: input.sortBy }),
         ...(input.sortOrder !== undefined && { sortOrder: input.sortOrder }),
-        ...(input.publicationYearFrom !== undefined && { publicationYearFrom: input.publicationYearFrom }),
-        ...(input.publicationYearTo !== undefined && { publicationYearTo: input.publicationYearTo }),
+        ...(input.publicationYearFrom !== undefined && {
+          publicationYearFrom: input.publicationYearFrom,
+        }),
+        ...(input.publicationYearTo !== undefined && {
+          publicationYearTo: input.publicationYearTo,
+        }),
         ...(input.category !== undefined && { category: input.category }),
         ...(input.availableOnly !== undefined && { availableOnly: input.availableOnly }),
       };

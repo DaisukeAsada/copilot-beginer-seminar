@@ -7,7 +7,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { UserService, createUserService } from './user-service.js';
 import type { UserRepository } from './user-repository.js';
-import type { User, CreateUserInput, UpdateUserInput, DEFAULT_LOAN_LIMIT } from './types.js';
+import type { User, CreateUserInput, UpdateUserInput } from './types.js';
 import { createUserId } from '../../shared/branded-types.js';
 import { ok, err, isOk, isErr } from '../../shared/result.js';
 
@@ -15,9 +15,7 @@ import { ok, err, isOk, isErr } from '../../shared/result.js';
 // モックリポジトリ作成ヘルパー
 // ============================================
 
-function createMockRepository(
-  overrides: Partial<UserRepository> = {}
-): UserRepository {
+function createMockRepository(overrides: Partial<UserRepository> = {}): UserRepository {
   return {
     create: vi.fn().mockResolvedValue(ok(createMockUser())),
     findById: vi.fn().mockResolvedValue(ok(createMockUser())),
@@ -238,9 +236,9 @@ describe('UserService', () => {
     it('存在しない利用者IDの場合はNOT_FOUNDエラーを返す', async () => {
       const userId = createUserId('non-existent');
       mockRepository = createMockRepository({
-        findById: vi.fn().mockResolvedValue(
-          err({ type: 'NOT_FOUND' as const, id: 'non-existent' })
-        ),
+        findById: vi
+          .fn()
+          .mockResolvedValue(err({ type: 'NOT_FOUND' as const, id: 'non-existent' })),
       });
       service = createUserService(mockRepository);
 
@@ -287,9 +285,9 @@ describe('UserService', () => {
     it('存在しない利用者IDの場合はNOT_FOUNDエラーを返す', async () => {
       const userId = createUserId('non-existent');
       mockRepository = createMockRepository({
-        findById: vi.fn().mockResolvedValue(
-          err({ type: 'NOT_FOUND' as const, id: 'non-existent' })
-        ),
+        findById: vi
+          .fn()
+          .mockResolvedValue(err({ type: 'NOT_FOUND' as const, id: 'non-existent' })),
       });
       service = createUserService(mockRepository);
 
@@ -336,9 +334,14 @@ describe('UserService', () => {
 
     it('更新時にメールアドレスが他の利用者と重複するとDUPLICATE_EMAILエラーを返す', async () => {
       const userId = createUserId('user-123');
-      const existingUser = createMockUser({ id: createUserId('user-456'), email: 'other@example.com' });
+      const existingUser = createMockUser({
+        id: createUserId('user-456'),
+        email: 'other@example.com',
+      });
       mockRepository = createMockRepository({
-        findById: vi.fn().mockResolvedValue(ok(createMockUser({ id: userId, email: 'current@example.com' }))),
+        findById: vi
+          .fn()
+          .mockResolvedValue(ok(createMockUser({ id: userId, email: 'current@example.com' }))),
         findByEmail: vi.fn().mockResolvedValue(existingUser),
       });
       service = createUserService(mockRepository);
@@ -406,9 +409,9 @@ describe('UserService', () => {
     it('存在しない利用者IDの場合はNOT_FOUNDエラーを返す', async () => {
       const userId = createUserId('non-existent');
       mockRepository = createMockRepository({
-        findById: vi.fn().mockResolvedValue(
-          err({ type: 'NOT_FOUND' as const, id: 'non-existent' })
-        ),
+        findById: vi
+          .fn()
+          .mockResolvedValue(err({ type: 'NOT_FOUND' as const, id: 'non-existent' })),
       });
       service = createUserService(mockRepository);
 
@@ -493,7 +496,11 @@ describe('UserService', () => {
     });
 
     it('複数条件で利用者を検索できる', async () => {
-      const user = createMockUser({ id: createUserId('user-1'), name: '山田太郎', email: 'yamada@example.com' });
+      const user = createMockUser({
+        id: createUserId('user-1'),
+        name: '山田太郎',
+        email: 'yamada@example.com',
+      });
       mockRepository = createMockRepository({
         search: vi.fn().mockResolvedValue([user]),
       });
@@ -578,9 +585,9 @@ describe('UserService', () => {
     it('存在しない利用者IDの場合はNOT_FOUNDエラーを返す', async () => {
       const userId = createUserId('non-existent');
       mockRepository = createMockRepository({
-        findById: vi.fn().mockResolvedValue(
-          err({ type: 'NOT_FOUND' as const, id: 'non-existent' })
-        ),
+        findById: vi
+          .fn()
+          .mockResolvedValue(err({ type: 'NOT_FOUND' as const, id: 'non-existent' })),
       });
       service = createUserService(mockRepository);
 

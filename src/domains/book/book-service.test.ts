@@ -15,9 +15,7 @@ import { ok, err, isOk, isErr } from '../../shared/result.js';
 // モックリポジトリ作成ヘルパー
 // ============================================
 
-function createMockRepository(
-  overrides: Partial<BookRepository> = {}
-): BookRepository {
+function createMockRepository(overrides: Partial<BookRepository> = {}): BookRepository {
   return {
     create: vi.fn().mockResolvedValue(ok(createMockBook())),
     findById: vi.fn().mockResolvedValue(ok(createMockBook())),
@@ -238,9 +236,7 @@ describe('BookService.getBookById', () => {
   it('存在しない書籍IDはNOT_FOUNDエラーを返す', async () => {
     const bookId = createBookId('non-existent');
     mockRepository = createMockRepository({
-      findById: vi.fn().mockResolvedValue(
-        err({ type: 'NOT_FOUND' as const, id: 'non-existent' })
-      ),
+      findById: vi.fn().mockResolvedValue(err({ type: 'NOT_FOUND' as const, id: 'non-existent' })),
     });
     service = createBookService(mockRepository);
 
@@ -294,9 +290,7 @@ describe('BookService.updateBook', () => {
   it('存在しない書籍IDはNOT_FOUNDエラーを返す', async () => {
     const bookId = createBookId('non-existent');
     mockRepository = createMockRepository({
-      findById: vi.fn().mockResolvedValue(
-        err({ type: 'NOT_FOUND' as const, id: 'non-existent' })
-      ),
+      findById: vi.fn().mockResolvedValue(err({ type: 'NOT_FOUND' as const, id: 'non-existent' })),
     });
     service = createBookService(mockRepository);
 
@@ -385,9 +379,7 @@ describe('BookService.deleteBook', () => {
   it('存在しない書籍IDはNOT_FOUNDエラーを返す', async () => {
     const bookId = createBookId('non-existent');
     mockRepository = createMockRepository({
-      findById: vi.fn().mockResolvedValue(
-        err({ type: 'NOT_FOUND' as const, id: 'non-existent' })
-      ),
+      findById: vi.fn().mockResolvedValue(err({ type: 'NOT_FOUND' as const, id: 'non-existent' })),
     });
     service = createBookService(mockRepository);
 
@@ -472,9 +464,9 @@ describe('BookService.createBookCopy', () => {
     it('存在しない書籍IDはNOT_FOUNDエラーを返す', async () => {
       const bookId = createBookId('non-existent');
       mockRepository = createMockRepository({
-        findById: vi.fn().mockResolvedValue(
-          err({ type: 'NOT_FOUND' as const, id: 'non-existent' })
-        ),
+        findById: vi
+          .fn()
+          .mockResolvedValue(err({ type: 'NOT_FOUND' as const, id: 'non-existent' })),
       });
       service = createBookService(mockRepository);
 
@@ -589,9 +581,9 @@ describe('BookService.updateCopyStatus', () => {
     it('存在しない蔵書コピーIDはNOT_FOUNDエラーを返す', async () => {
       const copyId = createCopyId('non-existent');
       mockRepository = createMockRepository({
-        findCopyById: vi.fn().mockResolvedValue(
-          err({ type: 'NOT_FOUND' as const, id: 'non-existent' })
-        ),
+        findCopyById: vi
+          .fn()
+          .mockResolvedValue(err({ type: 'NOT_FOUND' as const, id: 'non-existent' })),
       });
       service = createBookService(mockRepository);
 
@@ -662,9 +654,9 @@ describe('BookService.getCopiesByBookId', () => {
     it('存在しない書籍IDはNOT_FOUNDエラーを返す', async () => {
       const bookId = createBookId('non-existent');
       mockRepository = createMockRepository({
-        findById: vi.fn().mockResolvedValue(
-          err({ type: 'NOT_FOUND' as const, id: 'non-existent' })
-        ),
+        findById: vi
+          .fn()
+          .mockResolvedValue(err({ type: 'NOT_FOUND' as const, id: 'non-existent' })),
       });
       service = createBookService(mockRepository);
 

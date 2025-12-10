@@ -76,9 +76,7 @@ function validateISBN13Checksum(digits: string): boolean {
  * @param isbn - 検証対象のISBN文字列
  * @returns Result<string, ValidationError>
  */
-export function validateISBN(
-  isbn: string
-): Result<string, ValidationError> {
+export function validateISBN(isbn: string): Result<string, ValidationError> {
   if (!isbn || isbn.trim() === '') {
     return err({
       type: 'INVALID_ISBN',
@@ -113,7 +111,7 @@ export function validateISBN(
 
   return err({
     type: 'INVALID_ISBN',
-    message: `Invalid ISBN format: expected 10 or 13 digits, got ${digits.length}`,
+    message: `Invalid ISBN format: expected 10 or 13 digits, got ${String(digits.length)}`,
   });
 }
 
@@ -150,9 +148,7 @@ export function validateRequired(
  * @param email - 検証対象のメールアドレス
  * @returns Result<string, ValidationError>
  */
-export function validateEmail(
-  email: string
-): Result<string, ValidationError> {
+export function validateEmail(email: string): Result<string, ValidationError> {
   // 基本的なメール形式の正規表現
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

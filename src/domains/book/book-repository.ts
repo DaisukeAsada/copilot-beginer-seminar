@@ -7,7 +7,15 @@
 
 import type { BookId, CopyId } from '../../shared/branded-types.js';
 import type { Result } from '../../shared/result.js';
-import type { Book, CreateBookInput, UpdateBookInput, BookError, BookCopy, CreateCopyInput, BookCopyStatus } from './types.js';
+import type {
+  Book,
+  CreateBookInput,
+  UpdateBookInput,
+  BookError,
+  BookCopy,
+  CreateCopyInput,
+  BookCopyStatus,
+} from './types.js';
 
 // ============================================
 // リポジトリインターフェース

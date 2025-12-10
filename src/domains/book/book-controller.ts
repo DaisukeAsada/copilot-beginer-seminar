@@ -15,7 +15,43 @@ import { Router, type Request, type Response } from 'express';
 import type { BookId } from '../../shared/branded-types.js';
 import { isOk } from '../../shared/result.js';
 import type { BookService } from './book-service.js';
-import type { CreateBookInput, UpdateBookInput, CreateCopyInput, BookError } from './types.js';
+import type {
+  CreateBookInput,
+  UpdateBookInput,
+  CreateCopyInput,
+  BookError,
+  BookCopyStatus,
+} from './types.js';
+
+// ============================================
+// リクエストボディ型定義
+// ============================================
+
+/** 書籍登録リクエストボディ */
+interface CreateBookRequestBody {
+  title?: string;
+  author?: string;
+  publisher?: string | null;
+  publicationYear?: number | null;
+  isbn?: string;
+  category?: string | null;
+}
+
+/** 書籍更新リクエストボディ */
+interface UpdateBookRequestBody {
+  title?: string;
+  author?: string;
+  publisher?: string | null;
+  publicationYear?: number | null;
+  isbn?: string;
+  category?: string | null;
+}
+
+/** 蔵書コピー登録リクエストボディ */
+interface CreateCopyRequestBody {
+  location?: string;
+  status?: BookCopyStatus;
+}
 
 // ============================================
 // HTTPステータスコード決定
@@ -52,13 +88,14 @@ export function createBookController(bookService: BookService): Router {
   // ============================================
 
   router.post('/', async (req: Request, res: Response): Promise<void> => {
+    const body = req.body as CreateBookRequestBody;
     const input: CreateBookInput = {
-      title: req.body.title,
-      author: req.body.author,
-      publisher: req.body.publisher ?? null,
-      publicationYear: req.body.publicationYear ?? null,
-      isbn: req.body.isbn,
-      category: req.body.category ?? null,
+      title: body.title ?? '',
+      author: body.author ?? '',
+      publisher: body.publisher ?? null,
+      publicationYear: body.publicationYear ?? null,
+      isbn: body.isbn ?? '',
+      category: body.category ?? null,
     };
 
     const result = await bookService.createBook(input);
@@ -76,16 +113,17 @@ export function createBookController(bookService: BookService): Router {
   // ============================================
 
   router.put('/:id', async (req: Request, res: Response): Promise<void> => {
-    const bookId = req.params['id'] as BookId;
+    const bookId = req.params.id as BookId;
+    const body = req.body as UpdateBookRequestBody;
 
     // 指定されたフィールドのみを更新対象に含める
     const input: UpdateBookInput = {
-      ...(req.body.title !== undefined && { title: req.body.title }),
-      ...(req.body.author !== undefined && { author: req.body.author }),
-      ...(req.body.publisher !== undefined && { publisher: req.body.publisher }),
-      ...(req.body.publicationYear !== undefined && { publicationYear: req.body.publicationYear }),
-      ...(req.body.isbn !== undefined && { isbn: req.body.isbn }),
-      ...(req.body.category !== undefined && { category: req.body.category }),
+      ...(body.title !== undefined && { title: body.title }),
+      ...(body.author !== undefined && { author: body.author }),
+      ...(body.publisher !== undefined && { publisher: body.publisher }),
+      ...(body.publicationYear !== undefined && { publicationYear: body.publicationYear }),
+      ...(body.isbn !== undefined && { isbn: body.isbn }),
+      ...(body.category !== undefined && { category: body.category }),
     };
 
     const result = await bookService.updateBook(bookId, input);
@@ -103,7 +141,7 @@ export function createBookController(bookService: BookService): Router {
   // ============================================
 
   router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
-    const bookId = req.params['id'] as BookId;
+    const bookId = req.params.id as BookId;
 
     const result = await bookService.deleteBook(bookId);
 
@@ -120,7 +158,7 @@ export function createBookController(bookService: BookService): Router {
   // ============================================
 
   router.get('/:id', async (req: Request, res: Response): Promise<void> => {
-    const bookId = req.params['id'] as BookId;
+    const bookId = req.params.id as BookId;
 
     const result = await bookService.getBookById(bookId);
 
@@ -137,10 +175,11 @@ export function createBookController(bookService: BookService): Router {
   // ============================================
 
   router.post('/:id/copies', async (req: Request, res: Response): Promise<void> => {
-    const bookId = req.params['id'] as BookId;
+    const bookId = req.params.id as BookId;
+    const body = req.body as CreateCopyRequestBody;
     const input: CreateCopyInput = {
-      location: req.body.location,
-      status: req.body.status,
+      location: body.location ?? '',
+      status: body.status,
     };
 
     const result = await bookService.createBookCopy(bookId, input);

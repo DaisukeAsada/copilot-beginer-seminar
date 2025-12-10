@@ -57,7 +57,7 @@ export function err<T, E>(error: E): Result<T, E> {
  * @returns true if Ok
  */
 export function isOk<T, E>(result: Result<T, E>): result is Ok<T> {
-  return result.success === true;
+  return result.success;
 }
 
 /**
@@ -66,7 +66,7 @@ export function isOk<T, E>(result: Result<T, E>): result is Ok<T> {
  * @returns true if Err
  */
 export function isErr<T, E>(result: Result<T, E>): result is Err<E> {
-  return result.success === false;
+  return !result.success;
 }
 
 // ============================================
@@ -109,10 +109,7 @@ export function unwrapOr<T, E>(result: Result<T, E>, defaultValue: T): T {
  * @param fn - 変換関数
  * @returns 変換後のResult
  */
-export function map<T, U, E>(
-  result: Result<T, E>,
-  fn: (value: T) => U
-): Result<U, E> {
+export function map<T, U, E>(result: Result<T, E>, fn: (value: T) => U): Result<U, E> {
   if (isOk(result)) {
     return ok(fn(result.value));
   }
@@ -125,10 +122,7 @@ export function map<T, U, E>(
  * @param fn - 変換関数
  * @returns 変換後のResult
  */
-export function mapErr<T, E, F>(
-  result: Result<T, E>,
-  fn: (error: E) => F
-): Result<T, F> {
+export function mapErr<T, E, F>(result: Result<T, E>, fn: (error: E) => F): Result<T, F> {
   if (isErr(result)) {
     return err<T, F>(fn(result.error));
   }

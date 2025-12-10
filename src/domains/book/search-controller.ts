@@ -100,17 +100,23 @@ export function createSearchController(searchService: SearchService): Router {
 
   router.get('/search', async (req: Request, res: Response): Promise<void> => {
     // クエリパラメータの取得とパース
-    const keyword = typeof req.query['keyword'] === 'string' ? req.query['keyword'] : '';
-    const sortBy = parseSearchSortBy(req.query['sortBy'] as string | undefined);
-    const sortOrder = parseSearchSortOrder(req.query['sortOrder'] as string | undefined);
-    const publicationYearFrom = parseIntParam(req.query['publicationYearFrom'] as string | undefined, NaN);
-    const publicationYearTo = parseIntParam(req.query['publicationYearTo'] as string | undefined, NaN);
-    const category = typeof req.query['category'] === 'string' ? req.query['category'] : undefined;
-    const availableOnly = parseBoolParam(req.query['availableOnly'] as string | undefined);
+    const keyword = typeof req.query.keyword === 'string' ? req.query.keyword : '';
+    const sortBy = parseSearchSortBy(req.query.sortBy as string | undefined);
+    const sortOrder = parseSearchSortOrder(req.query.sortOrder as string | undefined);
+    const publicationYearFrom = parseIntParam(
+      req.query.publicationYearFrom as string | undefined,
+      NaN
+    );
+    const publicationYearTo = parseIntParam(req.query.publicationYearTo as string | undefined, NaN);
+    const category = typeof req.query.category === 'string' ? req.query.category : undefined;
+    const availableOnly = parseBoolParam(req.query.availableOnly as string | undefined);
 
     // ページネーションパラメータ
-    const page = Math.max(1, parseIntParam(req.query['page'] as string | undefined, DEFAULT_PAGE));
-    const limit = Math.min(MAX_LIMIT, Math.max(1, parseIntParam(req.query['limit'] as string | undefined, DEFAULT_LIMIT)));
+    const page = Math.max(1, parseIntParam(req.query.page as string | undefined, DEFAULT_PAGE));
+    const limit = Math.min(
+      MAX_LIMIT,
+      Math.max(1, parseIntParam(req.query.limit as string | undefined, DEFAULT_LIMIT))
+    );
 
     // SearchInput の構築
     const input: SearchInput = {

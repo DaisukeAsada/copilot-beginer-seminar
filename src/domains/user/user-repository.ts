@@ -7,7 +7,14 @@
 
 import type { UserId } from '../../shared/branded-types.js';
 import type { Result } from '../../shared/result.js';
-import type { User, CreateUserInput, UpdateUserInput, UserError, UserSearchCriteria, LoanSummary } from './types.js';
+import type {
+  User,
+  CreateUserInput,
+  UpdateUserInput,
+  UserError,
+  UserSearchCriteria,
+  LoanSummary,
+} from './types.js';
 
 // ============================================
 // リポジトリインターフェース

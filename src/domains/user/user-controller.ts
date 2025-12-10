@@ -17,6 +17,19 @@ import type { UserService } from './user-service.js';
 import type { CreateUserInput, UserSearchCriteria, UserError } from './types.js';
 
 // ============================================
+// リクエストボディ型定義
+// ============================================
+
+/** 利用者登録リクエストボディ */
+interface CreateUserRequestBody {
+  name?: string;
+  address?: string | null;
+  email?: string;
+  phone?: string | null;
+  loanLimit?: number;
+}
+
+// ============================================
 // HTTPステータスコード決定
 // ============================================
 
@@ -54,10 +67,10 @@ export function createUserController(userService: UserService): Router {
   router.get('/search', async (req: Request, res: Response): Promise<void> => {
     // クエリパラメータから検索条件を構築
     const criteria: UserSearchCriteria = {
-      ...(typeof req.query['name'] === 'string' && { name: req.query['name'] }),
-      ...(typeof req.query['userId'] === 'string' && { userId: req.query['userId'] }),
-      ...(typeof req.query['email'] === 'string' && { email: req.query['email'] }),
-      ...(typeof req.query['phone'] === 'string' && { phone: req.query['phone'] }),
+      ...(typeof req.query.name === 'string' && { name: req.query.name }),
+      ...(typeof req.query.userId === 'string' && { userId: req.query.userId }),
+      ...(typeof req.query.email === 'string' && { email: req.query.email }),
+      ...(typeof req.query.phone === 'string' && { phone: req.query.phone }),
     };
 
     const result = await userService.searchUsers(criteria);
@@ -75,12 +88,13 @@ export function createUserController(userService: UserService): Router {
   // ============================================
 
   router.post('/', async (req: Request, res: Response): Promise<void> => {
+    const body = req.body as CreateUserRequestBody;
     const input: CreateUserInput = {
-      name: req.body.name,
-      address: req.body.address ?? null,
-      email: req.body.email,
-      phone: req.body.phone ?? null,
-      loanLimit: req.body.loanLimit,
+      name: body.name ?? '',
+      address: body.address ?? null,
+      email: body.email ?? '',
+      phone: body.phone ?? null,
+      loanLimit: body.loanLimit,
     };
 
     const result = await userService.createUser(input);
@@ -98,7 +112,7 @@ export function createUserController(userService: UserService): Router {
   // ============================================
 
   router.get('/:id', async (req: Request, res: Response): Promise<void> => {
-    const userId = req.params['id'] as UserId;
+    const userId = req.params.id as UserId;
 
     const result = await userService.getUserById(userId);
 
@@ -115,7 +129,7 @@ export function createUserController(userService: UserService): Router {
   // ============================================
 
   router.get('/:id/loans', async (req: Request, res: Response): Promise<void> => {
-    const userId = req.params['id'] as UserId;
+    const userId = req.params.id as UserId;
 
     const result = await userService.getUserWithLoans(userId);
 

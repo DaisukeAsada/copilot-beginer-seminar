@@ -9,7 +9,12 @@ import { createLoanService, type LoanService } from './loan-service.js';
 import type { LoanRepository } from './loan-repository.js';
 import type { BookRepository } from '../book/book-repository.js';
 import type { UserRepository } from '../user/user-repository.js';
-import { createUserId, createCopyId, createLoanId, createBookId } from '../../shared/branded-types.js';
+import {
+  createUserId,
+  createCopyId,
+  createLoanId,
+  createBookId,
+} from '../../shared/branded-types.js';
 import { ok, err, isOk, isErr } from '../../shared/result.js';
 import type { Loan, CreateLoanInput } from './types.js';
 import type { User } from '../user/types.js';
@@ -30,7 +35,10 @@ function createMockLoanRepository(): LoanRepository {
   };
 }
 
-function createMockBookRepository(): Pick<BookRepository, 'findCopyById' | 'updateCopy' | 'findById'> {
+function createMockBookRepository(): Pick<
+  BookRepository,
+  'findCopyById' | 'updateCopy' | 'findById'
+> {
   return {
     findCopyById: vi.fn(),
     updateCopy: vi.fn(),
@@ -106,11 +114,7 @@ describe('LoanService', () => {
     mockLoanRepository = createMockLoanRepository();
     mockBookRepository = createMockBookRepository();
     mockUserRepository = createMockUserRepository();
-    loanService = createLoanService(
-      mockLoanRepository,
-      mockBookRepository,
-      mockUserRepository
-    );
+    loanService = createLoanService(mockLoanRepository, mockBookRepository, mockUserRepository);
   });
 
   describe('createLoan', () => {

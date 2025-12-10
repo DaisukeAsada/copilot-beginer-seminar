@@ -1,9 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  validateISBN,
-  validateRequired,
-  ValidationError,
-} from './validation.js';
+import { validateISBN, validateRequired } from './validation.js';
 
 describe('Validation Utilities', () => {
   describe('validateISBN', () => {

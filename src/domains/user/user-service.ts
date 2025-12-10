@@ -9,7 +9,14 @@ import type { Result } from '../../shared/result.js';
 import { ok, err, isErr } from '../../shared/result.js';
 import { validateRequired, validateEmail } from '../../shared/validation.js';
 import type { UserRepository } from './user-repository.js';
-import type { User, CreateUserInput, UpdateUserInput, UserError, UserSearchCriteria, UserWithLoans } from './types.js';
+import type {
+  User,
+  CreateUserInput,
+  UpdateUserInput,
+  UserError,
+  UserSearchCriteria,
+  UserWithLoans,
+} from './types.js';
 import { DEFAULT_LOAN_LIMIT } from './types.js';
 
 // ============================================
@@ -69,9 +76,7 @@ export interface UserService {
 /**
  * 利用者登録入力をバリデーション
  */
-function validateCreateUserInput(
-  input: CreateUserInput
-): Result<CreateUserInput, UserError> {
+function validateCreateUserInput(input: CreateUserInput): Result<CreateUserInput, UserError> {
   // 氏名必須チェック
   const nameResult = validateRequired(input.name, 'name');
   if (isErr(nameResult)) {
@@ -102,13 +107,13 @@ function validateCreateUserInput(
     });
   }
 
-  // 貸出上限チェック（指定がある場合）
-  if (input.loanLimit !== undefined && input.loanLimit !== null) {
+  // 貫出上限チェック（指定がある場合）
+  if (input.loanLimit !== undefined) {
     if (input.loanLimit <= 0) {
       return err({
         type: 'VALIDATION_ERROR',
         field: 'loanLimit',
-        message: '貸出上限は1以上である必要があります',
+        message: '貫出上限は1以上である必要があります',
       });
     }
   }
@@ -119,9 +124,7 @@ function validateCreateUserInput(
 /**
  * 利用者更新入力をバリデーション
  */
-function validateUpdateUserInput(
-  input: UpdateUserInput
-): Result<UpdateUserInput, UserError> {
+function validateUpdateUserInput(input: UpdateUserInput): Result<UpdateUserInput, UserError> {
   // 氏名が指定されている場合は空でないかチェック
   if (input.name !== undefined) {
     const nameResult = validateRequired(input.name, 'name');
@@ -155,13 +158,13 @@ function validateUpdateUserInput(
     }
   }
 
-  // 貸出上限チェック（指定がある場合）
-  if (input.loanLimit !== undefined && input.loanLimit !== null) {
+  // 貫出上限チェック（指定がある場合）
+  if (input.loanLimit !== undefined) {
     if (input.loanLimit <= 0) {
       return err({
         type: 'VALIDATION_ERROR',
         field: 'loanLimit',
-        message: '貸出上限は1以上である必要があります',
+        message: '貫出上限は1以上である必要があります',
       });
     }
   }

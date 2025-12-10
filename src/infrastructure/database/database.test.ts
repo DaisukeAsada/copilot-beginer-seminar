@@ -1,14 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import {
-  createDatabaseConfig,
-  DatabaseConfig,
-  DatabasePool,
-} from './database.js';
+import { createDatabaseConfig, DatabasePool } from './database.js';
 
 describe('Database Configuration', () => {
   it('should create a database config with default values', () => {
     const config = createDatabaseConfig();
-    
+
     expect(config).toBeDefined();
     expect(config.host).toBe('localhost');
     expect(config.port).toBe(5432);
@@ -41,7 +37,7 @@ describe('DatabasePool', () => {
   it('should create a database pool instance', () => {
     const config = createDatabaseConfig();
     const pool = new DatabasePool(config);
-    
+
     expect(pool).toBeDefined();
     expect(pool.getConfig()).toEqual(config);
   });
@@ -49,14 +45,14 @@ describe('DatabasePool', () => {
   it('should provide query method', () => {
     const config = createDatabaseConfig();
     const pool = new DatabasePool(config);
-    
+
     expect(typeof pool.query).toBe('function');
   });
 
   it('should provide close method', () => {
     const config = createDatabaseConfig();
     const pool = new DatabasePool(config);
-    
+
     expect(typeof pool.close).toBe('function');
   });
 });

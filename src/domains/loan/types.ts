@@ -52,7 +52,12 @@ export interface LoanReceipt {
 export type LoanError =
   | { readonly type: 'VALIDATION_ERROR'; readonly field: string; readonly message: string }
   | { readonly type: 'BOOK_NOT_AVAILABLE'; readonly copyId: string }
-  | { readonly type: 'LOAN_LIMIT_EXCEEDED'; readonly userId: string; readonly limit: number; readonly currentCount: number }
+  | {
+      readonly type: 'LOAN_LIMIT_EXCEEDED';
+      readonly userId: string;
+      readonly limit: number;
+      readonly currentCount: number;
+    }
   | { readonly type: 'USER_NOT_FOUND'; readonly userId: string }
   | { readonly type: 'COPY_NOT_FOUND'; readonly copyId: string }
   | { readonly type: 'LOAN_NOT_FOUND'; readonly loanId: string };

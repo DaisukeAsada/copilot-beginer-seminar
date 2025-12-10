@@ -86,16 +86,14 @@ describe('BookController', () => {
       const book = createTestBook();
       vi.mocked(mockService.createBook).mockResolvedValue(ok(book));
 
-      const response = await request(app)
-        .post('/api/books')
-        .send({
-          title: 'Test Book',
-          author: 'Test Author',
-          publisher: 'Test Publisher',
-          publicationYear: 2024,
-          isbn: '9784123456789',
-          category: 'Fiction',
-        });
+      const response = await request(app).post('/api/books').send({
+        title: 'Test Book',
+        author: 'Test Author',
+        publisher: 'Test Publisher',
+        publicationYear: 2024,
+        isbn: '9784123456789',
+        category: 'Fiction',
+      });
 
       expect(response.status).toBe(201);
       expect(response.body.id).toBe('book-1');
@@ -108,9 +106,7 @@ describe('BookController', () => {
         err({ type: 'VALIDATION_ERROR', field: 'title', message: 'title is required' })
       );
 
-      const response = await request(app)
-        .post('/api/books')
-        .send({ isbn: '9784123456789' });
+      const response = await request(app).post('/api/books').send({ isbn: '9784123456789' });
 
       expect(response.status).toBe(400);
       expect(response.body.error.type).toBe('VALIDATION_ERROR');
@@ -122,13 +118,11 @@ describe('BookController', () => {
         err({ type: 'DUPLICATE_ISBN', isbn: '9784123456789' })
       );
 
-      const response = await request(app)
-        .post('/api/books')
-        .send({
-          title: 'Test Book',
-          author: 'Test Author',
-          isbn: '9784123456789',
-        });
+      const response = await request(app).post('/api/books').send({
+        title: 'Test Book',
+        author: 'Test Author',
+        isbn: '9784123456789',
+      });
 
       expect(response.status).toBe(409);
       expect(response.body.error.type).toBe('DUPLICATE_ISBN');
@@ -144,9 +138,7 @@ describe('BookController', () => {
       const updatedBook = createTestBook({ title: 'Updated Title' });
       vi.mocked(mockService.updateBook).mockResolvedValue(ok(updatedBook));
 
-      const response = await request(app)
-        .put('/api/books/book-1')
-        .send({ title: 'Updated Title' });
+      const response = await request(app).put('/api/books/book-1').send({ title: 'Updated Title' });
 
       expect(response.status).toBe(200);
       expect(response.body.title).toBe('Updated Title');
@@ -171,9 +163,7 @@ describe('BookController', () => {
         err({ type: 'VALIDATION_ERROR', field: 'title', message: 'title cannot be empty' })
       );
 
-      const response = await request(app)
-        .put('/api/books/book-1')
-        .send({ title: '' });
+      const response = await request(app).put('/api/books/book-1').send({ title: '' });
 
       expect(response.status).toBe(400);
       expect(response.body.error.type).toBe('VALIDATION_ERROR');
@@ -188,8 +178,7 @@ describe('BookController', () => {
     it('正常系: 書籍を削除して204を返す', async () => {
       vi.mocked(mockService.deleteBook).mockResolvedValue(ok(undefined));
 
-      const response = await request(app)
-        .delete('/api/books/book-1');
+      const response = await request(app).delete('/api/books/book-1');
 
       expect(response.status).toBe(204);
       expect(mockService.deleteBook).toHaveBeenCalledWith('book-1');
@@ -200,8 +189,7 @@ describe('BookController', () => {
         err({ type: 'NOT_FOUND', id: 'book-999' })
       );
 
-      const response = await request(app)
-        .delete('/api/books/book-999');
+      const response = await request(app).delete('/api/books/book-999');
 
       expect(response.status).toBe(404);
       expect(response.body.error.type).toBe('NOT_FOUND');
@@ -217,8 +205,7 @@ describe('BookController', () => {
       const book = createTestBook();
       vi.mocked(mockService.getBookById).mockResolvedValue(ok(book));
 
-      const response = await request(app)
-        .get('/api/books/book-1');
+      const response = await request(app).get('/api/books/book-1');
 
       expect(response.status).toBe(200);
       expect(response.body.id).toBe('book-1');
@@ -231,8 +218,7 @@ describe('BookController', () => {
         err({ type: 'NOT_FOUND', id: 'book-999' })
       );
 
-      const response = await request(app)
-        .get('/api/books/book-999');
+      const response = await request(app).get('/api/books/book-999');
 
       expect(response.status).toBe(404);
       expect(response.body.error.type).toBe('NOT_FOUND');
@@ -248,12 +234,10 @@ describe('BookController', () => {
       const copy = createTestBookCopy();
       vi.mocked(mockService.createBookCopy).mockResolvedValue(ok(copy));
 
-      const response = await request(app)
-        .post('/api/books/book-1/copies')
-        .send({
-          location: 'Shelf A-1',
-          status: 'AVAILABLE',
-        });
+      const response = await request(app).post('/api/books/book-1/copies').send({
+        location: 'Shelf A-1',
+        status: 'AVAILABLE',
+      });
 
       expect(response.status).toBe(201);
       expect(response.body.id).toBe('copy-1');
@@ -282,9 +266,7 @@ describe('BookController', () => {
         err({ type: 'VALIDATION_ERROR', field: 'location', message: 'location is required' })
       );
 
-      const response = await request(app)
-        .post('/api/books/book-1/copies')
-        .send({});
+      const response = await request(app).post('/api/books/book-1/copies').send({});
 
       expect(response.status).toBe(400);
       expect(response.body.error.type).toBe('VALIDATION_ERROR');

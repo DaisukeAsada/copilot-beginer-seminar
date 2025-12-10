@@ -14,7 +14,7 @@ describe('Schema Migrations', () => {
   describe('Books Table', () => {
     it('should create books table migration with correct structure', () => {
       const migration = createBooksTableMigration();
-      
+
       expect(migration.name).toBe('001_create_books_table');
       expect(migration.up).toContain('CREATE TABLE books');
       expect(migration.up).toContain('id UUID PRIMARY KEY');
@@ -33,7 +33,7 @@ describe('Schema Migrations', () => {
   describe('BookCopies Table', () => {
     it('should create book_copies table migration with correct structure', () => {
       const migration = createBookCopiesTableMigration();
-      
+
       expect(migration.name).toBe('002_create_book_copies_table');
       expect(migration.up).toContain('CREATE TABLE book_copies');
       expect(migration.up).toContain('id UUID PRIMARY KEY');
@@ -41,7 +41,9 @@ describe('Schema Migrations', () => {
       expect(migration.up).toContain('location VARCHAR(100) NOT NULL');
       expect(migration.up).toContain('status VARCHAR(20) NOT NULL');
       expect(migration.up).toContain("DEFAULT 'AVAILABLE'");
-      expect(migration.up).toContain("CHECK (status IN ('AVAILABLE', 'BORROWED', 'RESERVED', 'MAINTENANCE'))");
+      expect(migration.up).toContain(
+        "CHECK (status IN ('AVAILABLE', 'BORROWED', 'RESERVED', 'MAINTENANCE'))"
+      );
       expect(migration.down).toBe('DROP TABLE IF EXISTS book_copies;');
     });
   });
@@ -49,7 +51,7 @@ describe('Schema Migrations', () => {
   describe('Users Table', () => {
     it('should create users table migration with correct structure', () => {
       const migration = createUsersTableMigration();
-      
+
       expect(migration.name).toBe('003_create_users_table');
       expect(migration.up).toContain('CREATE TABLE users');
       expect(migration.up).toContain('id UUID PRIMARY KEY');
@@ -66,7 +68,7 @@ describe('Schema Migrations', () => {
   describe('Loans Table', () => {
     it('should create loans table migration with correct structure', () => {
       const migration = createLoansTableMigration();
-      
+
       expect(migration.name).toBe('004_create_loans_table');
       expect(migration.up).toContain('CREATE TABLE loans');
       expect(migration.up).toContain('id UUID PRIMARY KEY');
@@ -82,7 +84,7 @@ describe('Schema Migrations', () => {
   describe('Reservations Table', () => {
     it('should create reservations table migration with correct structure', () => {
       const migration = createReservationsTableMigration();
-      
+
       expect(migration.name).toBe('005_create_reservations_table');
       expect(migration.up).toContain('CREATE TABLE reservations');
       expect(migration.up).toContain('id UUID PRIMARY KEY');
@@ -92,7 +94,9 @@ describe('Schema Migrations', () => {
       expect(migration.up).toContain('notified_at');
       expect(migration.up).toContain('expires_at');
       expect(migration.up).toContain('status VARCHAR(20) NOT NULL');
-      expect(migration.up).toContain("CHECK (status IN ('PENDING', 'NOTIFIED', 'FULFILLED', 'EXPIRED', 'CANCELLED'))");
+      expect(migration.up).toContain(
+        "CHECK (status IN ('PENDING', 'NOTIFIED', 'FULFILLED', 'EXPIRED', 'CANCELLED'))"
+      );
       expect(migration.down).toBe('DROP TABLE IF EXISTS reservations;');
     });
   });
@@ -100,7 +104,7 @@ describe('Schema Migrations', () => {
   describe('OverdueRecords Table', () => {
     it('should create overdue_records table migration with correct structure', () => {
       const migration = createOverdueRecordsTableMigration();
-      
+
       expect(migration.name).toBe('006_create_overdue_records_table');
       expect(migration.up).toContain('CREATE TABLE overdue_records');
       expect(migration.up).toContain('id UUID PRIMARY KEY');
@@ -114,7 +118,7 @@ describe('Schema Migrations', () => {
   describe('Full Text Search Index', () => {
     it('should create GIN index migration for full text search', () => {
       const migration = createFullTextSearchIndexMigration();
-      
+
       expect(migration.name).toBe('007_create_full_text_search_index');
       expect(migration.up).toContain('CREATE INDEX');
       expect(migration.up).toContain('ON books');
@@ -129,7 +133,7 @@ describe('Schema Migrations', () => {
   describe('Get All Migrations', () => {
     it('should return all migrations in correct order', () => {
       const migrations = getAllMigrations();
-      
+
       expect(migrations).toHaveLength(7);
       expect(migrations[0]!.name).toBe('001_create_books_table');
       expect(migrations[1]!.name).toBe('002_create_book_copies_table');

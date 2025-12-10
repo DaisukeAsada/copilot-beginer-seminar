@@ -85,14 +85,12 @@ describe('UserController', () => {
       const user = createTestUser();
       vi.mocked(mockService.createUser).mockResolvedValue(ok(user));
 
-      const response = await request(app)
-        .post('/api/users')
-        .send({
-          name: '山田 太郎',
-          address: '東京都渋谷区1-2-3',
-          email: 'yamada@example.com',
-          phone: '03-1234-5678',
-        });
+      const response = await request(app).post('/api/users').send({
+        name: '山田 太郎',
+        address: '東京都渋谷区1-2-3',
+        email: 'yamada@example.com',
+        phone: '03-1234-5678',
+      });
 
       expect(response.status).toBe(201);
       expect(response.body.id).toBe('user-1');
@@ -105,9 +103,7 @@ describe('UserController', () => {
         err({ type: 'VALIDATION_ERROR', field: 'name', message: 'name is required' })
       );
 
-      const response = await request(app)
-        .post('/api/users')
-        .send({ email: 'test@example.com' });
+      const response = await request(app).post('/api/users').send({ email: 'test@example.com' });
 
       expect(response.status).toBe(400);
       expect(response.body.error.type).toBe('VALIDATION_ERROR');
@@ -119,12 +115,10 @@ describe('UserController', () => {
         err({ type: 'DUPLICATE_EMAIL', email: 'yamada@example.com' })
       );
 
-      const response = await request(app)
-        .post('/api/users')
-        .send({
-          name: '山田 太郎',
-          email: 'yamada@example.com',
-        });
+      const response = await request(app).post('/api/users').send({
+        name: '山田 太郎',
+        email: 'yamada@example.com',
+      });
 
       expect(response.status).toBe(409);
       expect(response.body.error.type).toBe('DUPLICATE_EMAIL');
@@ -140,8 +134,7 @@ describe('UserController', () => {
       const user = createTestUser();
       vi.mocked(mockService.getUserById).mockResolvedValue(ok(user));
 
-      const response = await request(app)
-        .get('/api/users/user-1');
+      const response = await request(app).get('/api/users/user-1');
 
       expect(response.status).toBe(200);
       expect(response.body.id).toBe('user-1');
@@ -154,8 +147,7 @@ describe('UserController', () => {
         err({ type: 'NOT_FOUND', id: 'user-999' })
       );
 
-      const response = await request(app)
-        .get('/api/users/user-999');
+      const response = await request(app).get('/api/users/user-999');
 
       expect(response.status).toBe(404);
       expect(response.body.error.type).toBe('NOT_FOUND');
@@ -171,9 +163,7 @@ describe('UserController', () => {
       const users = [createTestUser()];
       vi.mocked(mockService.searchUsers).mockResolvedValue(ok(users));
 
-      const response = await request(app)
-        .get('/api/users/search')
-        .query({ name: '山田' });
+      const response = await request(app).get('/api/users/search').query({ name: '山田' });
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveLength(1);
@@ -185,9 +175,7 @@ describe('UserController', () => {
       const users = [createTestUser()];
       vi.mocked(mockService.searchUsers).mockResolvedValue(ok(users));
 
-      const response = await request(app)
-        .get('/api/users/search')
-        .query({ userId: 'user-1' });
+      const response = await request(app).get('/api/users/search').query({ userId: 'user-1' });
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveLength(1);
@@ -226,9 +214,7 @@ describe('UserController', () => {
     it('正常系: 検索結果が0件の場合は空配列を返す', async () => {
       vi.mocked(mockService.searchUsers).mockResolvedValue(ok([]));
 
-      const response = await request(app)
-        .get('/api/users/search')
-        .query({ name: '存在しない' });
+      const response = await request(app).get('/api/users/search').query({ name: '存在しない' });
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveLength(0);
@@ -236,11 +222,14 @@ describe('UserController', () => {
 
     it('異常系: 検索条件なしで400を返す', async () => {
       vi.mocked(mockService.searchUsers).mockResolvedValue(
-        err({ type: 'VALIDATION_ERROR', field: 'criteria', message: '検索条件を1つ以上指定してください' })
+        err({
+          type: 'VALIDATION_ERROR',
+          field: 'criteria',
+          message: '検索条件を1つ以上指定してください',
+        })
       );
 
-      const response = await request(app)
-        .get('/api/users/search');
+      const response = await request(app).get('/api/users/search');
 
       expect(response.status).toBe(400);
       expect(response.body.error.type).toBe('VALIDATION_ERROR');
@@ -269,8 +258,7 @@ describe('UserController', () => {
       };
       vi.mocked(mockService.getUserWithLoans).mockResolvedValue(ok(userWithLoans));
 
-      const response = await request(app)
-        .get('/api/users/user-1/loans');
+      const response = await request(app).get('/api/users/user-1/loans');
 
       expect(response.status).toBe(200);
       expect(response.body.user.id).toBe('user-1');
@@ -288,8 +276,7 @@ describe('UserController', () => {
       };
       vi.mocked(mockService.getUserWithLoans).mockResolvedValue(ok(userWithLoans));
 
-      const response = await request(app)
-        .get('/api/users/user-1/loans');
+      const response = await request(app).get('/api/users/user-1/loans');
 
       expect(response.status).toBe(200);
       expect(response.body.currentLoans).toHaveLength(0);
@@ -301,8 +288,7 @@ describe('UserController', () => {
         err({ type: 'NOT_FOUND', id: 'user-999' })
       );
 
-      const response = await request(app)
-        .get('/api/users/user-999/loans');
+      const response = await request(app).get('/api/users/user-999/loans');
 
       expect(response.status).toBe(404);
       expect(response.body.error.type).toBe('NOT_FOUND');

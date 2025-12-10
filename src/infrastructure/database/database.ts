@@ -15,9 +15,7 @@ export interface DatabaseConfig {
 /**
  * Create database configuration with defaults
  */
-export function createDatabaseConfig(
-  overrides: Partial<DatabaseConfig> = {}
-): DatabaseConfig {
+export function createDatabaseConfig(overrides: Partial<DatabaseConfig> = {}): DatabaseConfig {
   return {
     host: overrides.host ?? 'localhost',
     port: overrides.port ?? 5432,
@@ -32,8 +30,8 @@ export function createDatabaseConfig(
  * Database connection pool wrapper
  */
 export class DatabasePool {
-  private pool: Pool;
-  private config: DatabaseConfig;
+  private readonly pool: Pool;
+  private readonly config: DatabaseConfig;
 
   constructor(config: DatabaseConfig) {
     this.config = config;

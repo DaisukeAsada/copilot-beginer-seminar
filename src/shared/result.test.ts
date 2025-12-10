@@ -1,16 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  Result,
-  ok,
-  err,
-  isOk,
-  isErr,
-  unwrap,
-  unwrapOr,
-  map,
-  mapErr,
-  flatMap,
-} from './result.js';
+import { ok, err, isOk, isErr, unwrap, unwrapOr, map, mapErr, flatMap } from './result.js';
 
 describe('Result Pattern', () => {
   describe('ok', () => {
@@ -129,9 +118,7 @@ describe('Result Pattern', () => {
 
     it('should propagate error from chained operation', () => {
       const result = ok(10);
-      const chained = flatMap(result, (x: number) =>
-        x > 5 ? err('too big') : ok(x * 2)
-      );
+      const chained = flatMap(result, (x: number) => (x > 5 ? err('too big') : ok(x * 2)));
       expect(chained).toEqual({ success: false, error: 'too big' });
     });
   });

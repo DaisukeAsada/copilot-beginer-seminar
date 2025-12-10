@@ -9,7 +9,15 @@ import type { Result } from '../../shared/result.js';
 import { ok, err, isErr } from '../../shared/result.js';
 import { validateISBN, validateRequired } from '../../shared/validation.js';
 import type { BookRepository } from './book-repository.js';
-import type { Book, CreateBookInput, UpdateBookInput, BookError, BookCopy, CreateCopyInput, BookCopyStatus } from './types.js';
+import type {
+  Book,
+  CreateBookInput,
+  UpdateBookInput,
+  BookError,
+  BookCopy,
+  CreateCopyInput,
+  BookCopyStatus,
+} from './types.js';
 
 // ============================================
 // サービスインターフェース
@@ -81,9 +89,7 @@ export interface BookService {
 /**
  * 書籍登録入力をバリデーション
  */
-function validateCreateBookInput(
-  input: CreateBookInput
-): Result<CreateBookInput, BookError> {
+function validateCreateBookInput(input: CreateBookInput): Result<CreateBookInput, BookError> {
   // タイトル必須チェック
   const titleResult = validateRequired(input.title, 'title');
   if (isErr(titleResult)) {
@@ -130,9 +136,7 @@ function validateCreateBookInput(
 /**
  * 書籍更新入力をバリデーション
  */
-function validateUpdateBookInput(
-  input: UpdateBookInput
-): Result<UpdateBookInput, BookError> {
+function validateUpdateBookInput(input: UpdateBookInput): Result<UpdateBookInput, BookError> {
   // タイトルが指定されていて空の場合はエラー
   if (input.title !== undefined && input.title.trim() === '') {
     return err({
@@ -178,9 +182,7 @@ function validateUpdateBookInput(
 /**
  * 蔵書コピー登録入力をバリデーション
  */
-function validateCreateCopyInput(
-  input: CreateCopyInput
-): Result<CreateCopyInput, BookError> {
+function validateCreateCopyInput(input: CreateCopyInput): Result<CreateCopyInput, BookError> {
   // 所在場所必須チェック
   const locationResult = validateRequired(input.location, 'location');
   if (isErr(locationResult)) {
@@ -229,10 +231,7 @@ export function createBookService(repository: BookRepository): BookService {
       return repository.findById(id);
     },
 
-    async updateBook(
-      id: BookId,
-      input: UpdateBookInput
-    ): Promise<Result<Book, BookError>> {
+    async updateBook(id: BookId, input: UpdateBookInput): Promise<Result<Book, BookError>> {
       // 書籍存在チェック
       const existingResult = await repository.findById(id);
       if (isErr(existingResult)) {

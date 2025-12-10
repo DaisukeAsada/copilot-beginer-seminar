@@ -21,6 +21,16 @@ export default tseslint.config(
       '@typescript-eslint/strict-boolean-expressions': 'error',
     },
   },
+  // テストファイル用のルール緩和
+  {
+    files: ['**/*.test.ts', '**/*.spec.ts'],
+    rules: {
+      '@typescript-eslint/unbound-method': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'off',
+    },
+  },
   {
     ignores: ['dist/**', 'node_modules/**', '*.js', '*.cjs', '*.mjs'],
   }
