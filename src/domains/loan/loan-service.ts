@@ -6,7 +6,7 @@
 
 import type { Result } from '../../shared/result.js';
 import { ok, err, isErr } from '../../shared/result.js';
-import type { CopyId } from '../../shared/branded-types.js';
+import type { CopyId, LoanId } from '../../shared/branded-types.js';
 import type { LoanRepository } from './loan-repository.js';
 import type { BookRepository } from '../book/book-repository.js';
 import type { UserRepository } from '../user/user-repository.js';
@@ -48,6 +48,13 @@ export interface LoanService {
   getBulkCopyLoanStatus(
     copyIds: readonly CopyId[]
   ): Promise<Result<Map<CopyId, CopyLoanStatus>, never>>;
+
+  /**
+   * IDで貸出を取得
+   * @param id - 貸出ID
+   * @returns 貸出またはエラー
+   */
+  getLoanById(id: LoanId): Promise<Result<Loan, LoanError>>;
 }
 
 // ============================================
@@ -266,6 +273,10 @@ export function createLoanService(
       }
 
       return ok(statusMap);
+    },
+
+    async getLoanById(id: LoanId): Promise<Result<Loan, LoanError>> {
+      return await loanRepository.findById(id);
     },
   };
 }

@@ -105,7 +105,7 @@
   - 蔵書コピーごとの現在状態取得
   - _Requirements: 3.5_
 
-- [ ] 5.4 貸出管理 REST API エンドポイント
+- [x] 5.4 貸出管理 REST API エンドポイント
   - POST /api/loans - 貸出処理
   - GET /api/loans/:id - 貸出詳細
   - 適切なエラーレスポンス（貸出不可、上限超過）
