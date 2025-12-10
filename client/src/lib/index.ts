@@ -10,3 +10,11 @@ export {
   type UpdateBookInput,
   type BookApiError,
 } from './book-api';
+export {
+  searchBooks,
+  type SearchBook,
+  type SearchResult,
+  type SearchParams,
+  type SearchSortBy,
+  type SearchSortOrder,
+} from './search-api';
