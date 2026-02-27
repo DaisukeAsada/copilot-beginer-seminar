@@ -1,0 +1,121 @@
+---
+name: <Instruction Name>
+description: <このInstructionの目的を1行で>
+applyTo: "<適用対象のglobパターン>"
+---
+
+# <分野名> 開発ガイド
+
+このファイルは `<対象ディレクトリ/レイヤー>` の開発で守るルールを定義します。
+
+## 目的
+
+- <狙い1>
+- <狙い2>
+- <狙い3>
+
+## スコープ
+
+- 対象: `<例: client/src/** | src/** | **/*.ts>`
+- 非対象: `<例: tests/, scripts/, e2e/>`
+- 依存関係: `<例: UI → Service → Repository の一方向依存>`
+
+## アーキテクチャ方針
+
+- 層構成: `<例: components/pages/lib または controller/service/repository>`
+- 責務分離: `<各層の責務を1行ずつ>`
+- 禁止事項: `<例: UIから直接fetchしない / Domainで例外を投げない>`
+
+## 必須ルール
+
+### 1. <ルール名>
+
+```
+// ✅ 正しい例
+<good_example>
+
+// ❌ 間違い例
+<bad_example>
+```
+
+### 2. <ルール名>
+
+```
+// ✅ 正しい例
+<good_example>
+
+// ❌ 間違い例
+<bad_example>
+```
+
+### 3. <ルール名>
+
+- 背景: <なぜ必要か>
+- 要件: <必須条件>
+- 例外: <例外条件>
+
+## 設計パターン
+
+### <パターン名>
+
+- 責務: <何を担当するか>
+- 入力: <Input型/契約>
+- 出力: <Output型/契約>
+
+```
+<template_code>
+```
+
+## エラーハンドリング
+
+- エラー分類: `<VALIDATION_ERROR | NOT_FOUND | CONFLICT | INTERNAL_ERROR ...>`
+- 返却方式: `<Result型 / 例外 / UI Alert / HTTP status mapping>`
+- ログ方針: `<構造化ログ / 機微情報マスク / 相関ID>`
+
+## テスト方針
+
+- 単体テスト: `<対象・観点>`
+- 結合テスト: `<対象・観点>`
+- 回帰観点: `<バグ再発防止の観点>`
+
+```bash
+<project_test_command>
+```
+
+## コーディング規約
+
+- 命名: `<例: createXxx, useXxx, XxxService>`
+- 型: `<readonly / 戻り値型明示 / any禁止 / unknown優先>`
+- インポート: `<拡張子 / type import / エイリアス規則>`
+- 非機能: `<パフォーマンス / セキュリティ / 可観測性の最低要件>`
+
+## 運用ルール（任意）
+
+- ブランチ運用: `<命名規則・PR粒度>`
+- レビュー観点: `<必ず見るポイント>`
+- リリース条件: `<必須チェック項目>`
+
+## 変更時チェックリスト
+
+- [ ] ルールに反する実装がない
+- [ ] 型エラーがない
+- [ ] 既存テストが通る
+- [ ] 新規/変更ロジックに対するテストを追加
+- [ ] ドキュメント（必要時）を更新
+
+## 品質チェックコマンド
+
+```bash
+<lint_command>
+<typecheck_command>
+<test_command>
+<build_command_optional>
+```
+
+## 記入例（最小）
+
+```yaml
+name: Client-side Development
+description: React + TypeScript クライアントサイド開発向け規約
+applyTo: "client/src/**/*.{ts,tsx}"
+```
