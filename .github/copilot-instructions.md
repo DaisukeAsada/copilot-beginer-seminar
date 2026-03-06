@@ -1,12 +1,24 @@
 # プロジェクトガイドライン
 
+## 前提条件
+- チャットへの回答は、日本語で行う。
+- すべてのドキュメント（README、設計書、コメントなど）は、日本語で記述する。
+- 大きな変更を行う場合は、事前に計画を提案して承認を得てから実装を開始する。
+
+## 技術構成
+- バックエンド: Node.js + Express + TypeScript
+- フロントエンド: React + Vite + TypeScript
+- データベース: PostgreSQL
+- テスト: Vitest（バックエンド/フロント）+ React Testing Library（フロント）
+- Lint/Format: ESLint + Prettier
+
 ## コードスタイル
 - TypeScript を前提に、型安全を優先する。
-- 既存コードに合わせて、日本語コメントを維持する（必要な箇所のみ簡潔に）。
-- ルート（バックエンド）は厳格な ESLint 設定を採用しているため、特に次を守る。
+- 日本語コメントは必要な箇所のみ簡潔に記述する。
+- バックエンドでは次を徹底する。
   - 関数の戻り値型を明示する。
   - 未使用引数は `_` プレフィックスを使う。
-  - 真偽判定は曖昧なチェックを避け、`null` / `undefined` を明示的に扱う。
+  - `null` / `undefined` を明示的に扱い、曖昧な真偽判定を避ける。
 - フロントエンドは既存の React + TypeScript 構成に従う。
 
 参考:
@@ -15,10 +27,10 @@
 
 ## アーキテクチャ
 - モノレポ構成。
-  - `src/`: Express ベースのバックエンド
-  - `client/src/`: React + Vite のフロントエンド
-- バックエンドはドメイン単位（`src/domains/*`）で、Controller → Service → Repository の責務分離を行う。
-- エラーハンドリングは例外中心ではなく `Result<T, E>` を使う。
+  - `src/`: バックエンド
+  - `client/src/`: フロントエンド
+- バックエンドは `src/domains/*` で Controller → Service → Repository を分離する。
+- エラーハンドリングは例外より `Result<T, E>` を優先する。
 - インフラ実装は `src/infrastructure/*` に集約する。
 
 参考:
@@ -28,24 +40,14 @@
 - `client/src/lib/api-client.ts`
 
 ## ビルドとテスト
-- 依存関係インストール:
-  - ルート: `npm install`
-  - フロント: `cd client && npm install`
-- バックエンド:
-  - 開発実行: `npm run dev`
-  - ビルド: `npm run build`
-  - テスト: `npm run test:run`
-  - Lint: `npm run lint`
-- フロントエンド:
-  - 開発実行: `cd client && npm run dev`
-  - ビルド: `cd client && npm run build`
-  - テスト: `cd client && npm run test:run`
-  - Lint: `cd client && npm run lint`
+- 依存関係: `npm install`、`cd client && npm install`
+- バックエンド: `npm run dev` / `npm run build` / `npm run test:run` / `npm run lint`
+- フロントエンド: `cd client && npm run dev` / `npm run build` / `npm run test:run` / `npm run lint`
 
 ## プロジェクト固有の規約
-- バックエンドのユースケース実装では、可能な限り `Result<T, E>` を返し、`isOk` / `isErr` で分岐する。
-- バリデーションは入力境界（主に Controller / Service の入口）で実施し、ドメインエラー型に正規化する。
-- ID は Branded Types（例: `BookId`, `UserId`）を使う既存方針に合わせる。
-- `src/index.ts` の `/api/books` では `searchRouter` を先にマウントしている。ルーティング変更時は順序による退行に注意する。
-- フロントエンドの API 通信は `client/src/lib/api-client.ts` を基盤に統一し、認証トークンやエラー処理の実装を重複させない。
-- 開発時の API 接続先は Vite の `/api` プロキシ（`client/vite.config.ts`）前提。バックエンドは `localhost:3000` で起動する。
+- ユースケースは可能な限り `Result<T, E>` を返し、`isOk` / `isErr` で分岐する。
+- バリデーションは入力境界（主に Controller / Service 入口）で行う。
+- ID は Branded Types（例: `BookId`, `UserId`）を利用する。
+- `src/index.ts` の `/api/books` は `searchRouter` を先にマウントする（順序退行に注意）。
+- API 通信は `client/src/lib/api-client.ts` に統一し、処理の重複実装を避ける。
+- 開発時は Vite の `/api` プロキシ（`client/vite.config.ts`）経由で `localhost:3000` に接続する。
