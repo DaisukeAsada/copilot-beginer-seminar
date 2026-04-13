@@ -41,7 +41,7 @@
 ## 実装規約
 - 例外を多用せず、`src/shared/result.ts` の `Result<T, E>` (`ok`/`err`/`isOk`/`isErr`) でエラーを表現する。
 - ID や識別子は `src/shared/branded-types.ts` の Branded Types を使い、`string` の生利用を避ける。
-- 入力バリデーションは Controller 境界で実施し、Service には検証済みデータを渡す。
+- 入力バリデーションは責務を分離し、Controller では外部入力の型・形・必須項目をチェックし、Service ではドメインルールや業務上の整合性を検証して `Result` で返す。
 - 新規機能は既存ドメインの公開面 (`src/domains/*/index.ts`) を更新して、外部公開 API を明確化する。
 - フロントエンドの API 呼び出しは `client/src/lib/api-client.ts` と各 `*-api.ts` を経由し、画面から直接 `fetch` を乱立させない。
 
