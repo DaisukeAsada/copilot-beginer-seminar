@@ -14,7 +14,8 @@ applyTo: "src/**/*.ts"
 
 ## レイヤー境界
 - 依存方向は `Controller -> Service -> Repository` を維持し、逆方向参照を作らない。
-- Controller で入力バリデーションを行い、Service には検証済みデータを渡す。
+- Controller は HTTP リクエスト/レスポンスの境界を扱い、入力の受け取り・必要最小限の整形・Service 呼び出しを担う。
+- 入力値の妥当性検証やドメインルールに関わるバリデーションは Service 側で `src/shared/validation.ts` を用いて実施し、結果は `Result<T, E>` で返す既存パターンに合わせる。
 - ドメイン公開 API は `src/domains/*/index.ts` に集約し、新規追加時は公開面を更新する。
 
 ## エラーと型
