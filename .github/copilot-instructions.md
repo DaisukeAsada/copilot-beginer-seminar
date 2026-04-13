@@ -1,144 +1,71 @@
-# 図書館蔵書管理システム - AI開発ガイド（概要）
+# Project Guidelines
 
-このプロジェクトは**ドメイン駆動設計（DDD）**に基づいた図書館蔵書管理システムです。モノレポ構造で、サーバー（Express + TypeScript）とクライアント（React + TypeScript）から構成されています。
+## 適用範囲
+この指示はワークスペース全体に適用する。
 
-## Copilotの共通設定
-- 必ず日本語で回答する
-- まず要件を整理し、不明点があれば必要最小限だけ確認する
-- 既存の設計・命名・フォルダ構成に合わせ、変更は必要な範囲に絞る
+## 回答言語
+- 必ず日本語で回答する。
 
-## プロジェクト構成
+## コードスタイル
+- TypeScript は `strict` 前提で、`any` の導入は最小限にする。
+- 既存の ESLint/Prettier 設定を優先し、手動でスタイルを持ち込まない。
+- 既存の命名とレイヤー構成（Controller/Service/Repository、`index.ts` で公開 API 集約）に合わせる。
+- ESM 前提のため、バックエンドの import は既存実装に合わせて `.js` 拡張子を明示する。
 
-```
-copilot-beginer-seminar/
-├── src/                              # サーバーサイド（Node.js/Express）
-│   ├── domains/                      # ドメイン層（7つのドメイン）
-│   ├── infrastructure/               # インフラ層（DB・リポジトリ）
-│   └── shared/                       # 共有ユーティリティ（Result型・ブランド型）
-├── client/src/                       # クライアントサイド（React）
-│   ├── components/                   # UI コンポーネント
-│   ├── pages/                        # ページコンポーネント
-│   ├── lib/                          # API クライアント層
-│   ├── contexts/                     # Context API（状態管理）
-│   └── routes/                       # ルーティング定義
-├── .github/
-│   ├── copilot-instructions.md       # このファイル（全体概要）
-│   └── instructions/
-│       ├── typescript.instructions.md # TypeScript基本規約（既存）
-│       ├── server.instructions.md     # サーバーサイド詳細ガイド
-│       └── client.instructions.md     # クライアントサイド詳細ガイド
-```
+## アーキテクチャ
+- モノレポ構成:
+  - `src/`: Express ベースのバックエンド
+  - `client/src/`: React + Vite フロントエンド
+- バックエンドはドメイン単位 (`src/domains/*`) で実装し、依存方向は `Controller -> Service -> Repository` を維持する。
+- 共通ロジックは `src/shared/` に集約する。特に `Result<T, E>` と Branded Types を優先して使う。
+- フロントエンドは `pages/` を画面単位、`components/` を再利用 UI、`lib/` を API 呼び出し層として責務分離する。
 
-## ドメイン構成
+## ビルドとテスト
+- バックエンド (workspace root):
+  - `npm run dev`: 開発サーバー起動
+  - `npm run build`: TypeScript ビルド
+  - `npm test` / `npm run test:run`: Vitest
+  - `npm run lint`: ESLint
+  - `npm run db:init`: DB 初期化/マイグレーション適用
+- フロントエンド (`client/`):
+  - `npm run dev`: Vite 開発サーバー起動
+  - `npm run build`: 型チェック + ビルド
+  - `npm test` / `npm run test:run`: Vitest
+  - `npm run lint`: ESLint
+- 変更時は、影響範囲に応じて最小でも関連テストを実行する。
 
-プロジェクトは以下の7つのドメインで構成されています：
+## 実装フロー
+- 実装は TDD (Test-Driven Development) に従い、`Red -> Green -> Refactor` の順で進める。
+- まず失敗するテストで要求仕様または不具合を明文化し、そのテストを通す最小実装のみを加える。
+- バグ修正は「再現テスト追加 -> 失敗確認 -> 修正 -> 成功確認」の順で進める。
+- リファクタリングのみの場合は振る舞いを変更せず既存テストをグリーンに保つ。振る舞い変更がある場合は、先に失敗テストを追加する。
+- 1つの変更目的に対して1つ以上の対応テストを追加し、テスト意図が不明瞭なケースを避ける。
 
-1. **auth** - 認証・認可（RBAC）
-2. **book** - 書籍・蔵書管理（CRUD・検索）
-3. **loan** - 貸出管理（貸出・返却・延滞）
-4. **user** - 利用者管理（CRUD・検索）
-5. **reservation** - 予約管理（予約・キャンセル）
-6. **report** - レポート生成（統計・ランキング）
-7. **notification** - 通知サービス（非同期通知）
+## 実装規約
+- 例外を多用せず、`src/shared/result.ts` の `Result<T, E>` (`ok`/`err`/`isOk`/`isErr`) でエラーを表現する。
+- ID や識別子は `src/shared/branded-types.ts` の Branded Types を使い、`string` の生利用を避ける。
+- 入力バリデーションは責務を分離し、Controller では外部入力の型・形・必須項目をチェックし、Service ではドメインルールや業務上の整合性を検証して `Result` で返す。
+- 新規機能は既存ドメインの公開面 (`src/domains/*/index.ts`) を更新して、外部公開 API を明確化する。
+- フロントエンドの API 呼び出しは `client/src/lib/api-client.ts` と各 `*-api.ts` を経由し、画面から直接 `fetch` を乱立させない。
 
-## 技術スタック
+## テスト規約
+- バックエンドは Vitest で、モック Repository を注入する既存パターンを踏襲する。
+- フロントエンドは React Testing Library を使い、ユーザー操作起点で振る舞いを検証する。
+- テストファイルのスタイルは既存の `*.test.ts(x)` に合わせる。
 
-### サーバーサイド
-- **言語**: TypeScript
-- **フレームワーク**: Express.js 5.x
-- **データベース**: PostgreSQL
-- **テスト**: Vitest + Supertest
-- **ビルド**: TypeScript Compiler
+## 参照優先ファイル
+- `src/shared/result.ts`
+- `src/shared/branded-types.ts`
+- `src/domains/auth/auth-controller.ts`
+- `src/domains/auth/auth-service.ts`
+- `src/domains/book/book-service.ts`
+- `src/e2e/e2e-integration.test.ts`
+- `client/src/contexts/auth-context.tsx`
+- `client/src/lib/api-client.ts`
+- `client/src/components/FormInput.tsx`
+- `client/src/pages/BooksPage.tsx`
 
-### クライアントサイド
-- **言語**: TypeScript
-- **フレームワーク**: React 19 + React Router 7
-- **バンドラー**: Vite
-- **テスト**: Vitest + React Testing Library
-- **データ取得**: カスタムfetch
-
-## 重要な共通原則
-
-### 1. 例外を投げない
-- すべてのビジネスロジックはResult<T, E>型を返す
-- 異常終了は型で表現
-
-### 2. 型安全性
-- ブランド型を使用してIDの型安全性を保証
-- インターフェース駆動で実装から分離
-
-### 3. テスト駆動開発（TDD）
-- すべてのテストは "RED → GREEN → REFACTOR" に従う
-- テストコメントに「TDD:」を記載
-
-### 4. 依存性注入
-- サービス・リポジトリはファクトリ関数で生成
-- `src/index.ts`でコンポーネントを組み立て
-
-### 5. コード品質
-- ESLint・Prettier設定を遵守
-- TypeScript コンパイルエラーなし
-- 複雑な処理には日本語コメント記載
-
-## セットアップと開発ワークフロー
-
-### 初期セットアップ
-```bash
-# サーバー
-npm install
-npm run db:init  # データベース初期化
-
-# クライアント
-cd client && npm install
-```
-
-### 開発
-```bash
-# サーバー
-npm run dev       # 開発サーバー起動
-npm test          # テスト（ウォッチモード）
-npm run lint      # ESLintチェック
-
-# クライアント
-cd client && npm run dev  # 開発サーバー起動
-cd client && npm test     # テスト
-cd client && npm run lint # ESLintチェック
-```
-
-### ビルド・デプロイ
-```bash
-# サーバー
-npm run build     # コンパイル
-
-# クライアント
-cd client && npm run build  # バンドル（dist生成）
-```
-
-## API レスポンス仕様
-
-### 成功時（2xx）
-```json
-{
-  "id": "B001",
-  "title": "TypeScript実践ガイド",
-  "author": "著者名",
-  ...
-}
-```
-
-### エラー時
-```json
-{
-  "error": {
-    "type": "VALIDATION_ERROR|NOT_FOUND|DUPLICATE_ISBN|...",
-    "field": "fieldName",
-    "message": "詳細なエラーメッセージ"
-  }
-}
-```
-
-## 関連リソース
-
-- [VS Code Copilot カスタム指示ドキュメント](https://code.visualstudio.com/docs/copilot/customization/custom-instructions)
-- TypeScript設定: `tsconfig.json`
-- ESLint設定: `eslint.config.mjs`（サーバー）、`client/eslint.config.js`（クライアント）
+## 注意点
+- DB 初期化には PostgreSQL 環境変数 (`POSTGRES_HOST` など) が必要。
+- フロントエンド開発時は API プロキシ先（通常 `http://localhost:3000/api`）を前提にする。
+- 認証はセッションベースで、RBAC は `admin > librarian > patron` の階層を維持する。
