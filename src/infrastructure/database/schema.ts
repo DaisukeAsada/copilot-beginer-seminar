@@ -176,6 +176,19 @@ ALTER TABLE books ALTER COLUMN publisher SET NOT NULL;
 }
 
 /**
+ * Add cover_image column to books table migration
+ */
+export function addCoverImageToBooksMigration(): Migration {
+  return createMigration({
+    name: '009_add_cover_image_to_books',
+    up: `
+ALTER TABLE books ADD COLUMN IF NOT EXISTS cover_image BYTEA;
+`,
+    down: 'ALTER TABLE books DROP COLUMN IF EXISTS cover_image;',
+  });
+}
+
+/**
  * Get all migrations in order
  */
 export function getAllMigrations(): Migration[] {
@@ -188,5 +201,6 @@ export function getAllMigrations(): Migration[] {
     createOverdueRecordsTableMigration(),
     createFullTextSearchIndexMigration(),
     alterBooksPublisherNotNullMigration(),
+    addCoverImageToBooksMigration(),
   ];
 }

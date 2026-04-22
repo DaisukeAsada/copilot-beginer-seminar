@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, type FormEvent } from 'react';
+import React, { useState, useEffect, useCallback, useRef, type FormEvent, type ChangeEvent } from 'react';
 import { FormInput, DataTable, ConfirmDialog, Alert, type Column } from '../components';
 import {
   getBooks,
@@ -25,6 +25,7 @@ interface BookFormData {
   publicationYear: string;
   isbn: string;
   category: string;
+  coverImage: File | null;
 }
 
 /** アラート情報 */
@@ -44,7 +45,40 @@ const initialFormData: BookFormData = {
   publicationYear: '',
   isbn: '',
   category: '',
+  coverImage: null,
 };
+
+// ============================================
+// 定数
+// ============================================
+
+/** 表紙画像の最大ファイルサイズ（5MB） */
+const MAX_COVER_IMAGE_SIZE = 5 * 1024 * 1024;
+
+// ============================================
+// ヘルパー関数
+// ============================================
+
+/**
+ * FileをBase64文字列に変換
+ */
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      // "data:image/png;base64," プレフィックスを除去
+      const parts = result.split(',');
+      if (parts.length < 2 || parts[1] === undefined || parts[1] === '') {
+        reject(new Error('無効なファイル形式です'));
+        return;
+      }
+      resolve(parts[1]);
+    };
+    reader.onerror = () => reject(new Error('ファイルの読み込みに失敗しました'));
+    reader.readAsDataURL(file);
+  });
+}
 
 // ============================================
 // カラム定義
@@ -110,6 +144,7 @@ export function BooksPage(): React.ReactElement {
   const [alert, setAlert] = useState<AlertInfo | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Book | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const coverImageInputRef = useRef<HTMLInputElement>(null);
 
   // 書籍一覧を取得
   const fetchBooks = useCallback(async () => {
@@ -146,6 +181,7 @@ export function BooksPage(): React.ReactElement {
       publicationYear: book.publicationYear?.toString() ?? '',
       isbn: book.isbn,
       category: book.category ?? '',
+      coverImage: null,
     });
     setFormErrors({});
     setEditingBook(book);
@@ -159,13 +195,37 @@ export function BooksPage(): React.ReactElement {
     setFormData(initialFormData);
     setFormErrors({});
     setEditingBook(null);
+    if (coverImageInputRef.current) {
+      coverImageInputRef.current.value = '';
+    }
   }, []);
 
   // フォーム入力変更
-  const handleFormChange = useCallback((field: keyof BookFormData) => (value: string) => {
+  const handleFormChange = useCallback((field: keyof Omit<BookFormData, 'coverImage'>) => (value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     // エラーをクリア
     setFormErrors((prev) => ({ ...prev, [field]: undefined }));
+  }, []);
+
+  // 表紙画像選択
+  const handleCoverImageChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    if (file !== null) {
+      if (!file.type.startsWith('image/')) {
+        setFormErrors((prev) => ({ ...prev, coverImage: '画像ファイルを選択してください' }));
+        e.target.value = '';
+        setFormData((prev) => ({ ...prev, coverImage: null }));
+        return;
+      }
+      if (file.size > MAX_COVER_IMAGE_SIZE) {
+        setFormErrors((prev) => ({ ...prev, coverImage: '5MB以下のファイルを選択してください' }));
+        e.target.value = '';
+        setFormData((prev) => ({ ...prev, coverImage: null }));
+        return;
+      }
+    }
+    setFormData((prev) => ({ ...prev, coverImage: file }));
+    setFormErrors((prev) => ({ ...prev, coverImage: undefined }));
   }, []);
 
   // バリデーション
@@ -199,6 +259,17 @@ export function BooksPage(): React.ReactElement {
 
     setSubmitting(true);
     try {
+      let coverImageBase64: string | null = null;
+      if (formData.coverImage !== null) {
+        try {
+          coverImageBase64 = await fileToBase64(formData.coverImage);
+        } catch {
+          setFormErrors((prev) => ({ ...prev, coverImage: '画像の読み込みに失敗しました。別のファイルを選択してください' }));
+          setSubmitting(false);
+          return;
+        }
+      }
+
       const input: CreateBookInput | UpdateBookInput = {
         title: formData.title.trim(),
         author: formData.author.trim(),
@@ -208,6 +279,7 @@ export function BooksPage(): React.ReactElement {
           : null,
         isbn: formData.isbn.trim(),
         category: formData.category.trim() || null,
+        coverImage: coverImageBase64,
       };
 
       if (formMode === 'create') {
@@ -357,6 +429,30 @@ export function BooksPage(): React.ReactElement {
                 value={formData.category}
                 onChange={handleFormChange('category')}
               />
+              <div className="form-input-container">
+                <label htmlFor="coverImage" className="form-input-label">
+                  表紙画像（5MBまで）
+                </label>
+                <input
+                  id="coverImage"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleCoverImageChange}
+                  disabled={submitting}
+                  ref={coverImageInputRef}
+                  className="form-input"
+                  aria-describedby={formErrors.coverImage !== undefined ? 'coverImage-error' : undefined}
+                  aria-invalid={formErrors.coverImage !== undefined}
+                />
+                {formData.coverImage !== null && (
+                  <p className="form-input-help">{formData.coverImage.name}</p>
+                )}
+                {formErrors.coverImage !== undefined && (
+                  <div id="coverImage-error" className="form-input-error-message" role="alert">
+                    {formErrors.coverImage}
+                  </div>
+                )}
+              </div>
               <div className="books-page-form-actions">
                 <button
                   type="button"
