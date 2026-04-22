@@ -215,7 +215,7 @@ export function BooksPage(): React.ReactElement {
         isbn: formData.isbn.trim(),
         category: formData.category.trim() || null,
         pageCount: formData.pageCount !== ''
-          ? parseInt(formData.pageCount, 10)
+          ? (Number.isNaN(parseInt(formData.pageCount, 10)) ? null : parseInt(formData.pageCount, 10))
           : null,
         language: formData.language.trim() || null,
       };
