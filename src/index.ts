@@ -38,8 +38,8 @@ const PORT = process.env.PORT ?? 3000;
 // セキュリティミドルウェア（CSPヘッダー設定等）
 app.use(securityHeadersMiddleware);
 
-// JSON パース
-app.use(express.json());
+// JSON パース（5MB画像のbase64エンコード分を考慮して10MBに設定）
+app.use(express.json({ limit: '10mb' }));
 
 // 入力サニタイズミドルウェア
 app.use(sanitizeInputMiddleware);

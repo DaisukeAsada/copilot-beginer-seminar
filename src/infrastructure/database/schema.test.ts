@@ -7,6 +7,7 @@ import {
   createReservationsTableMigration,
   createOverdueRecordsTableMigration,
   createFullTextSearchIndexMigration,
+  addCoverImageToBooksMigration,
   getAllMigrations,
 } from './schema.js';
 
@@ -130,11 +131,21 @@ describe('Schema Migrations', () => {
     });
   });
 
+  describe('Add Cover Image Migration', () => {
+    it('should add cover_image column to books table', () => {
+      const migration = addCoverImageToBooksMigration();
+
+      expect(migration.name).toBe('009_add_cover_image_to_books');
+      expect(migration.up).toContain('ALTER TABLE books ADD COLUMN IF NOT EXISTS cover_image BYTEA');
+      expect(migration.down).toContain('ALTER TABLE books DROP COLUMN IF EXISTS cover_image');
+    });
+  });
+
   describe('Get All Migrations', () => {
     it('should return all migrations in correct order', () => {
       const migrations = getAllMigrations();
 
-      expect(migrations).toHaveLength(8);
+      expect(migrations).toHaveLength(9);
       expect(migrations[0]!.name).toBe('001_create_books_table');
       expect(migrations[1]!.name).toBe('002_create_book_copies_table');
       expect(migrations[2]!.name).toBe('003_create_users_table');
@@ -143,6 +154,7 @@ describe('Schema Migrations', () => {
       expect(migrations[5]!.name).toBe('006_create_overdue_records_table');
       expect(migrations[6]!.name).toBe('007_create_full_text_search_index');
       expect(migrations[7]!.name).toBe('008_alter_books_publisher_not_null');
+      expect(migrations[8]!.name).toBe('009_add_cover_image_to_books');
     });
   });
 });

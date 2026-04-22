@@ -25,6 +25,7 @@ interface BookRow {
   publication_year: number | null;
   isbn: string;
   category: string | null;
+  cover_image: Buffer | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -46,6 +47,7 @@ function rowToBook(row: BookRow): Book {
     publicationYear: row.publication_year,
     isbn: row.isbn,
     category: row.category,
+    coverImage: row.cover_image,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

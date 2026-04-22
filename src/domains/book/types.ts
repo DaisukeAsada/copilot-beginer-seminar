@@ -19,6 +19,7 @@ export interface Book {
   readonly publicationYear: number | null;
   readonly isbn: string;
   readonly category: string | null;
+  readonly coverImage: Buffer | null;
   readonly createdAt: Date;
   readonly updatedAt: Date;
 }
@@ -31,6 +32,7 @@ export interface CreateBookInput {
   readonly publicationYear?: number | null;
   readonly isbn: string;
   readonly category?: string | null;
+  readonly coverImage?: Buffer | null;
 }
 
 /** 書籍更新入力 */
@@ -41,6 +43,7 @@ export interface UpdateBookInput {
   readonly publicationYear?: number | null;
   readonly isbn?: string;
   readonly category?: string | null;
+  readonly coverImage?: Buffer | null;
 }
 
 // ============================================

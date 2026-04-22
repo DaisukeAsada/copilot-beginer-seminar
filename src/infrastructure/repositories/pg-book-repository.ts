@@ -31,6 +31,7 @@ interface BookRow {
   publication_year: number | null;
   isbn: string;
   category: string | null;
+  cover_image: Buffer | null;
   created_at: Date;
   updated_at: Date;
 }
@@ -56,6 +57,7 @@ function rowToBook(row: BookRow): Book {
     publicationYear: row.publication_year,
     isbn: row.isbn,
     category: row.category,
+    coverImage: row.cover_image,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -83,8 +85,8 @@ export function createPgBookRepository(pool: DatabasePool): BookRepository {
     async create(input: CreateBookInput): Promise<Result<Book, BookError>> {
       try {
         const result = await pool.query<BookRow>(
-          `INSERT INTO books (title, author, publisher, publication_year, isbn, category)
-           VALUES ($1, $2, $3, $4, $5, $6)
+          `INSERT INTO books (title, author, publisher, publication_year, isbn, category, cover_image)
+           VALUES ($1, $2, $3, $4, $5, $6, $7)
            RETURNING *`,
           [
             input.title,
@@ -93,6 +95,7 @@ export function createPgBookRepository(pool: DatabasePool): BookRepository {
             input.publicationYear ?? null,
             input.isbn,
             input.category ?? null,
+            input.coverImage ?? null,
           ]
         );
         const row = result.rows[0];
@@ -137,8 +140,9 @@ export function createPgBookRepository(pool: DatabasePool): BookRepository {
              publication_year = $4,
              isbn = $5,
              category = $6,
+             cover_image = $7,
              updated_at = NOW()
-           WHERE id = $7
+           WHERE id = $8
            RETURNING *`,
           [
             input.title ?? current.title,
@@ -147,6 +151,7 @@ export function createPgBookRepository(pool: DatabasePool): BookRepository {
             input.publicationYear !== undefined ? input.publicationYear : current.publication_year,
             input.isbn ?? current.isbn,
             input.category !== undefined ? input.category : current.category,
+            input.coverImage !== undefined ? input.coverImage : current.cover_image,
             id,
           ]
         );

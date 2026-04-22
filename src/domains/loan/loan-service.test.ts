@@ -99,6 +99,7 @@ const testBook: Book = {
   publicationYear: 1905,
   isbn: '978-4-00-310101-7',
   category: '日本文学',
+  coverImage: null,
   createdAt: new Date('2024-01-01'),
   updatedAt: new Date('2024-01-01'),
 };

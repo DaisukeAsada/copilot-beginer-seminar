@@ -35,6 +35,7 @@ interface CreateBookRequestBody {
   publicationYear?: number | null;
   isbn?: string;
   category?: string | null;
+  coverImage?: string | null;
 }
 
 /** 書籍更新リクエストボディ */
@@ -45,6 +46,7 @@ interface UpdateBookRequestBody {
   publicationYear?: number | null;
   isbn?: string;
   category?: string | null;
+  coverImage?: string | null;
 }
 
 /** 蔵書コピー登録リクエストボディ */
@@ -72,6 +74,28 @@ function getErrorStatusCode(error: BookError): number {
 }
 
 // ============================================
+// シリアライズヘルパー
+// ============================================
+
+/**
+ * BookをJSON送信用のオブジェクトに変換（coverImageをbase64文字列に変換）
+ */
+function serializeBook(book: import('./types.js').Book): Record<string, unknown> {
+  return {
+    ...book,
+    coverImage: book.coverImage !== null ? book.coverImage.toString('base64') : null,
+  };
+}
+
+/**
+ * base64文字列をBufferに変換
+ */
+function base64ToBuffer(base64: string | null | undefined): Buffer | null {
+  if (base64 === null || base64 === undefined || base64 === '') return null;
+  return Buffer.from(base64, 'base64');
+}
+
+// ============================================
 // コントローラーファクトリ
 // ============================================
 
@@ -96,12 +120,13 @@ export function createBookController(bookService: BookService): Router {
       publicationYear: body.publicationYear ?? null,
       isbn: body.isbn ?? '',
       category: body.category ?? null,
+      coverImage: base64ToBuffer(body.coverImage),
     };
 
     const result = await bookService.createBook(input);
 
     if (isOk(result)) {
-      res.status(201).json(result.value);
+      res.status(201).json(serializeBook(result.value));
     } else {
       const statusCode = getErrorStatusCode(result.error);
       res.status(statusCode).json({ error: result.error });
@@ -124,12 +149,13 @@ export function createBookController(bookService: BookService): Router {
       ...(body.publicationYear !== undefined && { publicationYear: body.publicationYear }),
       ...(body.isbn !== undefined && { isbn: body.isbn }),
       ...(body.category !== undefined && { category: body.category }),
+      ...(body.coverImage !== undefined && { coverImage: base64ToBuffer(body.coverImage) }),
     };
 
     const result = await bookService.updateBook(bookId, input);
 
     if (isOk(result)) {
-      res.status(200).json(result.value);
+      res.status(200).json(serializeBook(result.value));
     } else {
       const statusCode = getErrorStatusCode(result.error);
       res.status(statusCode).json({ error: result.error });
@@ -163,7 +189,7 @@ export function createBookController(bookService: BookService): Router {
     const result = await bookService.getBookById(bookId);
 
     if (isOk(result)) {
-      res.status(200).json(result.value);
+      res.status(200).json(serializeBook(result.value));
     } else {
       const statusCode = getErrorStatusCode(result.error);
       res.status(statusCode).json({ error: result.error });
