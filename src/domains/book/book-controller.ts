@@ -89,9 +89,12 @@ function serializeBook(book: import('./types.js').Book): Record<string, unknown>
 
 /**
  * base64文字列をBufferに変換
+ * 不正な文字列の場合はnullを返す
  */
 function base64ToBuffer(base64: string | null | undefined): Buffer | null {
   if (base64 === null || base64 === undefined || base64 === '') return null;
+  // base64として有効な文字のみを許可
+  if (!/^[A-Za-z0-9+/]*={0,2}$/.test(base64)) return null;
   return Buffer.from(base64, 'base64');
 }
 

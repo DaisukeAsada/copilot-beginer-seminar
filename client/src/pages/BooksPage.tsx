@@ -68,8 +68,12 @@ function fileToBase64(file: File): Promise<string> {
     reader.onload = () => {
       const result = reader.result as string;
       // "data:image/png;base64," プレフィックスを除去
-      const base64 = result.split(',')[1] ?? '';
-      resolve(base64);
+      const parts = result.split(',');
+      if (parts.length < 2 || parts[1] === undefined || parts[1] === '') {
+        reject(new Error('無効なファイル形式です'));
+        return;
+      }
+      resolve(parts[1]);
     };
     reader.onerror = () => reject(new Error('ファイルの読み込みに失敗しました'));
     reader.readAsDataURL(file);
@@ -206,11 +210,19 @@ export function BooksPage(): React.ReactElement {
   // 表紙画像選択
   const handleCoverImageChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] ?? null;
-    if (file !== null && file.size > MAX_COVER_IMAGE_SIZE) {
-      setFormErrors((prev) => ({ ...prev, coverImage: '5MB以下のファイルを選択してください' }));
-      e.target.value = '';
-      setFormData((prev) => ({ ...prev, coverImage: null }));
-      return;
+    if (file !== null) {
+      if (!file.type.startsWith('image/')) {
+        setFormErrors((prev) => ({ ...prev, coverImage: '画像ファイルを選択してください' }));
+        e.target.value = '';
+        setFormData((prev) => ({ ...prev, coverImage: null }));
+        return;
+      }
+      if (file.size > MAX_COVER_IMAGE_SIZE) {
+        setFormErrors((prev) => ({ ...prev, coverImage: '5MB以下のファイルを選択してください' }));
+        e.target.value = '';
+        setFormData((prev) => ({ ...prev, coverImage: null }));
+        return;
+      }
     }
     setFormData((prev) => ({ ...prev, coverImage: file }));
     setFormErrors((prev) => ({ ...prev, coverImage: undefined }));
@@ -247,9 +259,16 @@ export function BooksPage(): React.ReactElement {
 
     setSubmitting(true);
     try {
-      const coverImageBase64 = formData.coverImage !== null
-        ? await fileToBase64(formData.coverImage)
-        : null;
+      let coverImageBase64: string | null = null;
+      if (formData.coverImage !== null) {
+        try {
+          coverImageBase64 = await fileToBase64(formData.coverImage);
+        } catch {
+          setFormErrors((prev) => ({ ...prev, coverImage: '画像の読み込みに失敗しました。別のファイルを選択してください' }));
+          setSubmitting(false);
+          return;
+        }
+      }
 
       const input: CreateBookInput | UpdateBookInput = {
         title: formData.title.trim(),
